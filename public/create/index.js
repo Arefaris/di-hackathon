@@ -18,7 +18,7 @@ createBtn.addEventListener("click", (event)=>{
 socket.on("created", (data)=>{
     const {chatID} = data
 
-     window.location.href = `/chat/?id=${chatID}`
+     window.location.href = `/chat/?id=${chatID}&nickname=${nickname.value}`
 })
 
 
