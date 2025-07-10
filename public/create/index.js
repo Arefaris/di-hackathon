@@ -1,8 +1,9 @@
-const createBtnEl = document.querySelector(".create")
+const createBtn = document.querySelector(".create")
+const socket = io();
 const nickname = document.querySelector(".nickname")
 const room = document.querySelector(".room")
 
-createBtnEl.addEventListener("click", (event)=>{
+createBtn.addEventListener("click", (event)=>{
      event.preventDefault()
      if (nickname.value && room.value) {
 
@@ -15,9 +16,9 @@ createBtnEl.addEventListener("click", (event)=>{
 })
 
 socket.on("created", (data)=>{
-    const {chatId} = data
+    const {chatID} = data
 
-    console.log(chatId)
+    console.log(chatID)
 })
 
 
