@@ -1,5 +1,5 @@
 const createBtnEl = document.querySelector(".create")
 
-createBtnEl.addEventListener("click", ()=>{
-    
+createBtnEl.addEventListener("click", (event)=>{
+
 })
