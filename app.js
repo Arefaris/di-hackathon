@@ -16,15 +16,13 @@ const io = new Server(server, {
 
 const room = "123456789"
 
-
 app.use(express.static(__dirname + "/public/"))
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    
 
     socket.on("message", (data) => {
-        console.log(data)
+        
         socket.join(data.room);
         io.to(data.room).emit("message", {
             message: data.message
