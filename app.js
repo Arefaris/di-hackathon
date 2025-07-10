@@ -3,6 +3,7 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -28,10 +29,11 @@ io.on('connection', (socket) => {
     })
 
     socket.on("create", (data) => {
-        const {nickename} = data;
-
-        //What is going on here?
-        //
+        const {nickename, roomname} = data;
+        const chatID = uuidv4();
+        //TODO: Save to DB
+        socket.join(chatID);
+        io.to(chatID).emit("created", {chatID});
     })
 });
 
