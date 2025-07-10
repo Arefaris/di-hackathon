@@ -13,21 +13,25 @@ const io = new Server(server, {
     connectionStateRecovery: {}
 });
 
-
 const room = "123456789"
 
 app.use(express.static(__dirname + "/public/"))
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-
     socket.on("message", (data) => {
         
         socket.join(data.room);
         io.to(data.room).emit("message", {
             message: data.message
         })
+    })
 
+    socket.on("create", (data) => {
+        const {nickename} = data;
+
+        //What is going on here?
+        //
     })
 });
 
