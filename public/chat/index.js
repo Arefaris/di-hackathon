@@ -11,8 +11,9 @@ form.addEventListener('submit', (e) => {
 
         socket.emit("message", {
             message: input.value,
-            roomId: room
+            roomID: room
         });
+        
         input.value = '';
     }
 });
