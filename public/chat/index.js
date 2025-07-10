@@ -2,8 +2,12 @@ const socket = io();
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messagesList = document.getElementById("messages")
-const room = "123456789"
 
+const paramsString = window.location.search
+const searchParams = new URLSearchParams(paramsString);
+const rommID = searchParams.get("id")
+
+console.log(rommID)
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -11,7 +15,7 @@ form.addEventListener('submit', (e) => {
 
         socket.emit("message", {
             message: input.value,
-            roomID: room
+            roomID: rommID
         });
         
         input.value = '';

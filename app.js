@@ -22,7 +22,8 @@ io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on("message", (data) => {
         const {message, roomID} = data;
-        // socket.join(data.room);
+        socket.join(roomID);
+        
         io.to(roomID).emit("message", {
             message
         });
