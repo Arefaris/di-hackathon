@@ -21,11 +21,11 @@ app.use(express.static(__dirname + "/public/"))
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on("message", (data) => {
-        
-        socket.join(data.room);
-        io.to(data.room).emit("message", {
-            message: data.message
-        })
+        const {message, roomID} = data;
+        // socket.join(data.room);
+        io.to(roomID).emit("message", {
+            message
+        });
     })
 
     socket.on("create", (data) => {
