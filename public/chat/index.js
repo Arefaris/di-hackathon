@@ -34,13 +34,13 @@ socket.on("message", (data)=>{
 
     if (socket.id == data.from){
         msgcont.classList.add("msgcont-me")
-        msgNickName.textContent = "me"
+        msgNickName.textContent = data.sender
         msgText.textContent = data.message
         msgcont.appendChild(msgNickName)
         msgcont.appendChild(msgText)
     }else {
         msgcont.classList.add("msgcont-other")
-        msgNickName.textContent = "not me"
+        msgNickName.textContent = data.sender
         msgText.textContent = data.message
         msgcont.appendChild(msgNickName)
         msgcont.appendChild(msgText)
