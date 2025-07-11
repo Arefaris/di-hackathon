@@ -1,4 +1,4 @@
-import { handleChatEvents } from '../controllers/chatController.js';
+import { handleChatEvents } from '../controllers/messageController.js';
 import { handleRoomEvents } from '../controllers/roomController.js';
 
 export function setupSocket(io) {

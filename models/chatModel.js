@@ -1,23 +1,23 @@
-import knex from '../knexfile.js';
+import db from '../config/db.js';
 
 export async function createChat({ name, type, guid }) {
-  return await knex('chats')
+  return await db('chats')
     .insert({ name, type, guid })
     .returning('*');
 }
 
 export async function getChatById(id) {
-  return await knex('chats')
+  return await db('chats')
     .where({ id })
     .first();
 }
 
 export async function getChatByGUID(guid) {
-  return await knex('chats')
+  return await db('chats')
     .where({ guid })
     .first();
 }
 
 export async function getAllChats() {
-  return await knex('chats').select('*');
+  return await db('chats').select('*');
 }

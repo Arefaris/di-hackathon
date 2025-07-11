@@ -5,7 +5,7 @@ const path = require('path');
 dotenv.config();
 
 const connectionString = process.env.DATABASE_URL;
-
+const knex = 
 module.exports = {
   development: {
     client: 'pg',
