@@ -1,4 +1,4 @@
-import knex from '../config/db.js';
+import knex from '../knexfile.js';
 
 export async function addParticipant({ chat_id, user_id }) {
   return await knex('chat_participants')

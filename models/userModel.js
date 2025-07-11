@@ -1,4 +1,4 @@
-import knex from '../config/db.js';
+import knex from '../knexfile.js';
 
 export async function createUser({ username, password_hash }) {
   return await knex('users')

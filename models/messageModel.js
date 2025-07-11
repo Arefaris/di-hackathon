@@ -1,4 +1,4 @@
-import knex from '../config/db.js';
+import knex from '../knexfile.js';
 
 export async function createMessage({ chat_id, sender_id, content }) {
   return await knex('messages')

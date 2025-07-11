@@ -1,4 +1,4 @@
-import knex from '../config/db.js';
+import knex from '../knexfile.js';
 
 export async function createChat({ name, type, guid }) {
   return await knex('chats')
