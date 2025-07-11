@@ -2,7 +2,6 @@ const socket = io();
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messagesList = document.getElementById("messages")
-
 const paramsString = window.location.search
 const searchParams = new URLSearchParams(paramsString);
 const rommID = searchParams.get("id")
@@ -11,8 +10,11 @@ const nickname = searchParams.get("nickname")
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    if (input.value) {
+    if (!rommID){
+        alert("Room id is not correct")
+    }
 
+    if (input.value) {
         socket.emit("message", {
             sender: nickname,
             message: input.value,
@@ -23,15 +25,27 @@ form.addEventListener('submit', (e) => {
     }
 });
 
-
+//reciving message from server
 socket.on("message", (data)=>{
-     console.log(data.message)
+     
+    const msgcont = document.createElement("li")
+    const msgNickName = document.createElement("div")
+    const msgText = document.createElement("div")
 
-     const msg = document.createElement("li")
-     const nick = document.createElement("span")
-    
-     nick.textContent = nickname
-     msg.textContent = data.message
-     msg.appendChild(nick)
-     messagesList.appendChild(msg)
+    if (socket.id == data.from){
+        msgcont.classList.add("msgcont-me")
+        msgNickName.textContent = "me"
+        msgText.textContent = data.message
+        msgcont.appendChild(msgNickName)
+        msgcont.appendChild(msgText)
+    }else {
+        msgcont.classList.add("msgcont-other")
+        msgNickName.textContent = "not me"
+        msgText.textContent = data.message
+        msgcont.appendChild(msgNickName)
+        msgcont.appendChild(msgText)
+    }
+     
+     
+     messagesList.appendChild(msgcont)
 })
