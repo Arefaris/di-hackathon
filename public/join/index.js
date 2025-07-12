@@ -17,10 +17,13 @@ joinBtn.addEventListener("click", (event) => {
         socket.emit("chatCheck", {
          roomID: room.value});
             
-        socket.on("checked", (data)=>{ 
-            
-            localStorage.setItem("exist", data.messages);
-            window.location.href = `/chat/?id=${data.roomID}`
+        socket.on("chatCheck", (data)=>{ 
+            if (data.chatFlag){
+                 window.location.href = `/chat/?id=${room.value}`
+            }else {
+                alert("No such room exist, please enter a valid room")
+            }
+           
         })
     }
 })
