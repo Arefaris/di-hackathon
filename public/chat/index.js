@@ -9,11 +9,40 @@ const nickname = localStorage.getItem("nickname");
 
 
  socket.emit("join", {
-         roomID: roomID});
+         roomID: roomID,
+         nickname: nickname});
  
  socket.on("joined", (data)=>{ 
-    console.log(data)
+    renderHistory(data)
  })
+
+ const renderHistory = (data)=>{
+    const msgcont = document.createElement("li")
+    const msgNickName = document.createElement("div")
+    const msgText = document.createElement("div")
+
+    data.messages.forEach(message => {
+        
+        if (message.nickname === nickname){
+            msgcont.classList.add("msgcont-me")
+            msgNickName.textContent = message.nickname
+            msgText.textContent = message.content
+            msgcont.appendChild(msgNickName)
+            msgcont.appendChild(msgText)
+        }else {
+            msgcont.classList.add("msgcont-other")
+            msgNickName.textContent = message.nickname
+            msgText.textContent = message.content
+            msgcont.appendChild(msgNickName)
+            msgcont.appendChild(msgText)
+        }
+        
+    });
+
+
+     
+     messagesList.appendChild(msgcont)
+ }
 
  if(!nickname){
     nickname = "Anonymous"
@@ -44,7 +73,7 @@ socket.on("message", (data)=>{
     const msgNickName = document.createElement("div")
     const msgText = document.createElement("div")
 
-    if (socket.id == data.from){
+    if (nickname == data.sender){
         msgcont.classList.add("msgcont-me")
         msgNickName.textContent = data.sender
         msgText.textContent = data.message
