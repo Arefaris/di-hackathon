@@ -78,9 +78,10 @@ export const getUserByIdHandler = async (req, res) => {
 };
 
 export const updateUserByIdHandler = async (req, res) => {
+    console.log(req.body);
     const { id } = req.params;
     const { username, password } = req.body;
-
+    
     if (!username && !password) {
         return res.status(400).json({ msg: "Provide at least one field: username or password." });
     }
