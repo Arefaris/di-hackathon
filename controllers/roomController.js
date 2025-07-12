@@ -38,4 +38,15 @@ export function handleRoomEvents(io, socket) {
     socket.join(roomID);
     socket.emit('joined', { roomID, messages });
   });
+
+  socket.on('chatCheck', async ({ roomID }) => {
+    try {
+      const chat = await getChatByGUID(roomID);
+      const chatFlag = Boolean(chat);
+      socket.emit('chatCheck', { chatFlag });
+    } catch (error) {
+      console.error('Error in chatCheck:', error);
+      socket.emit('chatCheck', { chatFlag: false });
+    }
+  });
 }
