@@ -27,7 +27,7 @@ export function handleRoomEvents(io, socket) {
     }
   });
 
- socket.on('join', async ({ roomID, nickname }) => {
+  socket.on('join', async ({ roomID, nickname }) => {
     const chat = await getChatByGUID(roomID);
     if (!chat) {
       socket.emit('error', { message: 'Chat not found' });
@@ -35,16 +35,17 @@ export function handleRoomEvents(io, socket) {
     }
 
     let user = await findUserByUsername(nickname);
-    if (!user){
-      user = await createUser({username: nickname, password_hash: "passHash2"});
+    console.log(user);
+    if (!user) {
+      [user] = await createUser({ username: nickname, password_hash: "passHash2" });
     }
     console.log(user);
-    
+
     await addParticipant({ chat_id: chat.id, user_id: user.id });
 
     const messages = await getMessagesForChat(chat.id);
     console.log(messages);
-    
+
     socket.join(roomID);
     socket.emit('joined', { roomID, nickname, messages });
   });
