@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createChat, getChatByGUID } from '../models/chatModel.js';
 import { addParticipant } from '../models/chatParticipantModel.js'
 import { getMessagesForChat } from '../models/messageModel.js'
-import { createUser, findUserByUsername } from '../models/userModel.js'
+import { createUser, getUserByUsername } from '../models/userModel.js'
 
 export function handleRoomEvents(io, socket) {
   socket.on('create', async ({ nickname, roomname }) => {
@@ -34,14 +34,13 @@ export function handleRoomEvents(io, socket) {
       return;
     }
 
-    let user = await findUserByUsername(nickname);
+    let user = await getUserByUsername(nickname);
     if (!user) {
       [user] = await createUser({ username: nickname, password_hash: "passHash2" });
     }
     await addParticipant({ chat_id: chat.id, user_id: user.id });
 
     const messages = await getMessagesForChat(chat.id);
-    console.log(messages);
 
     socket.join(roomID);
     socket.emit('joined', { roomID, nickname, messages });

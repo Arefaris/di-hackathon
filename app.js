@@ -9,6 +9,7 @@ import { Server } from 'socket.io';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { setupSocket } from './socket/index.js';
+import userRouter from './routes/userRouter.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const limiter = rateLimit({
@@ -24,12 +25,16 @@ app.use(cors());
 app.use(compression());
 app.use(morgan('dev'));
 app.use(limiter);
+app.use(express.json());
 
 // Base error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Internal Server Error' });
 });
+
+// Connect user router
+app.use(userRouter);
 
 const server = createServer(app);
 const io = new Server(server, {

@@ -1,137 +1,103 @@
-import knex from '../knexfile.js';
 import bcrypt from 'bcrypt';
-import userModel from '../models/userModel.js';
+import {
+    createUser,
+    getUserByUsername,
+    getAllUsers,
+    getUserById,
+    updateUserById
+} from '../models/userModel.js';
 
 export const registerUser = async (req, res) => {
-    console.log("registerUser route");
     try {
-        const { email, username, first_name, last_name, password } = req.body;
-        if (!email || !username || !first_name || !last_name || !password) {
-            res.status(400).json({ msg: "Request should contain non-empty 'email', 'username', 'first_name' and 'last_name'  fields." });
-            return;
+        const { username, password } = req.body;
+        if (!username || !password) {
+            return res.status(400).json({ msg: "Username and password are required." });
         }
 
-        let addedUser;
-        await knex.transaction(async trx => {
-            [addedUser] = await trx("users")
-                .insert({ email, username, first_name, last_name }, ['id', 'email', 'username', 'first_name', 'last_name']);
+        const existingUser = await getUserByUsername(username);
+        if (existingUser) {
+            return res.status(409).json({ msg: "Username already taken." });
+        }
 
-            const hash = await bcrypt.hash(password, 10);
-            await trx("hashpwd")
-                .insert({ username, password: hash });
-        })
-        res.status(201).json({ msg: `User was registered`, addedUser });
+        const password_hash = await bcrypt.hash(password, 10);
+        const newUser = await createUser({ username, password_hash });
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: "Database error (register user)." });
+        res.status(201).json({ msg: "User registered", user: { id: newUser.id, username: newUser.username } });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: "Failed to register user." });
     }
 };
 
 export const loginUser = async (req, res) => {
-    console.log("loginUser route");
     try {
         const { username, password } = req.body;
         if (!username || !password) {
-            res.status(400).json({ msg: "Request should contain non-empty 'username' and 'password' fields." });
-            return;
+            return res.status(400).json({ msg: "Username and password are required." });
         }
 
-        const [record] = await knex('hashpwd').select("password").where({ username });
-        if (!record) {
-            return res.status(401).json({ msg: "Unauthorized" });
+        const user = await getUserByUsername(username);
+        if (!user) {
+            return res.status(401).json({ msg: "Invalid credentials." });
         }
-        const isValid = await bcrypt.compare(password, record.password);
-        if (isValid) {
-            res.json({ msg: "Authorized" });
-            return
+
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) {
+            return res.status(401).json({ msg: "Invalid credentials." });
         }
-        res.status(401).json({ msg: "Unauthorized" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: "Database error (login user)." });
+
+        res.status(200).json({ msg: "Login successful", user: { id: user.id, username: user.username } });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: "Failed to log in." });
     }
 };
 
-export const getAllUsers = async (req, res) => {
-    console.log("getAllUsers route");
+export const getAllUsersHandler = async (req, res) => {
     try {
-        const rows = await knex('users').select('id', 'email', 'username', 'first_name', 'last_name');
-        res.json(rows);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: "Database error (get all users)." });
-    };
+        const users = await getAllUsers();
+        res.status(200).json(users.map(({ id, username }) => ({ id, username })));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: "Failed to fetch users." });
+    }
 };
 
-export const getUserById = async (req, res) => {
-    console.log("getUserById route");
+export const getUserByIdHandler = async (req, res) => {
     const { id } = req.params;
-    if (!id) {
-        res.status(400).json({ msg: "Request should contain non-empty 'id' field." });
-        return;
-    };
-
     try {
-        const rows = await knex('users').select('id', 'email', 'username', 'first_name', 'last_name').where('id', id);
-
-        if (rows.length === 0) {
-            res.status(404).json({ msg: `User with id ${id} not found.` });
-            return;
-        };
-
-        res.json(rows[0]);
-        return;
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: "Database error (get user by ID.)" });
-    };
-};
-
-export const updateUserById = async (req, res) => {
-    console.log("updateUserById route");
-    try {
-        const { id } = req.params;
-        const { email, username, first_name, last_name, password } = req.body;
-        
-        const parsedId = parseInt(id, 10);
-        if (isNaN(parsedId)) {
-            return res.status(400).json({ msg: "ID should be a valid number." });
-        }
-        if (!email || !username || !first_name || !last_name) {
-            res.status(400).json({ msg: "Request should contain numeric 'id', and non-empty 'email', 'username', 'first_name' and 'last_name' fields." });
-            return;
-        }
-
-        const userRows = await knex('users').select('username').where('id', id);
-        if (userRows.length === 0) {
+        const user = await getUserById(id);
+        if (!user) {
             return res.status(404).json({ msg: `User with ID ${id} not found.` });
         }
-        const oldUsername = userRows[0].username;
+        res.status(200).json({ id: user.id, username: user.username });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: "Failed to fetch user." });
+    }
+};
 
-        let updatedUser;
-        await knex.transaction(async trx => {
-            [updatedUser] = await trx('users')
-                .where('id', id)
-                .update({
-                    email,
-                    username,
-                    first_name,
-                    last_name
-                }, ['id', 'email', 'username', 'first_name', 'last_name']);
+export const updateUserByIdHandler = async (req, res) => {
+    console.log(req.body);
+    const { id } = req.params;
+    const { username, password } = req.body;
+    
+    if (!username && !password) {
+        return res.status(400).json({ msg: "Provide at least one field: username or password." });
+    }
 
-            const hashpwdUpdate = { username };
-            if (password) {
-                const hash = await bcrypt.hash(password, 10);
-                hashpwdUpdate.password = hash;
-            }
-            await trx('hashpwd')
-                .where('username', oldUsername)
-                .update(hashpwdUpdate);
-        })
-        res.status(200).json({ msg: `User with ID ${id} was updated`, updatedUser });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: "Database error (update user by ID)." });
+    try {
+        const updates = {};
+        if (username) updates.username = username;
+        if (password) updates.password_hash = await bcrypt.hash(password, 10);
+        const updatedUser = await updateUserById(id, updates);
+        if (!updatedUser) {
+            return res.status(404).json({ msg: `User with ID ${id} not found.` });
+        }
+
+        res.status(200).json({ msg: "User updated", user: { id: updatedUser.id, username: updatedUser.username } });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: "Failed to update user." });
     }
 };
