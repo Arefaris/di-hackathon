@@ -4,13 +4,24 @@ const input = document.getElementById('input');
 const messagesList = document.getElementById("messages")
 const paramsString = window.location.search
 const searchParams = new URLSearchParams(paramsString);
-const rommID = searchParams.get("id")
-const nickname = searchParams.get("nickname")
+const roomID = searchParams.get("id")
+const nickname = localStorage.getItem("nickname");
+
+ socket.emit("join", {
+         roomID: roomID});
+ 
+ socket.on("joined", (data)=>{ 
+    console.log(data)
+ })
+
+ if(!nickname){
+    nickname = "Anonymous"
+}
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    if (!rommID){
+    if (!roomID){
         alert("Room id is not correct")
     }
 
@@ -18,7 +29,7 @@ form.addEventListener('submit', (e) => {
         socket.emit("message", {
             sender: nickname,
             message: input.value,
-            roomID: rommID
+            roomID: roomID
         });
         
         input.value = '';
