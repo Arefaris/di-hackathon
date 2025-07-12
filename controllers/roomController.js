@@ -28,7 +28,7 @@ export function handleRoomEvents(io, socket) {
     }
   });
 
-  socket.on('join', async ({ roomID }) => {
+ socket.on('join', async ({ roomID, nickname }) => {
     const chat = await getChatByGUID(roomID);
     if (!chat) {
       socket.emit('error', { message: 'Chat not found' });
@@ -36,7 +36,7 @@ export function handleRoomEvents(io, socket) {
     }
     const messages = await getMessagesForChat(chat.id);
     socket.join(roomID);
-    socket.emit('joined', { roomID, messages });
+    socket.emit('joined', { roomID, nickname, messages });
   });
 
   socket.on('chatCheck', async ({ roomID }) => {

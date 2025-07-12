@@ -8,8 +8,16 @@ export async function createMessage({ chat_id, sender_id, content }) {
 
 export async function getMessagesForChat(chat_id) {
   return await db('messages')
-    .where({ chat_id })
-    .orderBy('timestamp', 'asc');
+    .join('users', 'messages.sender_id', '=', 'users.id')
+    .select(
+      'messages.id',
+      'messages.content',
+      'messages.timestamp',
+      'messages.chat_id',
+      'users.username as sender_username'
+    )
+    .where('messages.chat_id', chat_id)
+    .orderBy('messages.timestamp', 'asc');
 }
 
 export async function getMessageById(id) {
