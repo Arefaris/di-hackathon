@@ -17,32 +17,30 @@ const nickname = localStorage.getItem("nickname");
  })
 
  const renderHistory = (data)=>{
-    const msgcont = document.createElement("li")
-    const msgNickName = document.createElement("div")
-    const msgText = document.createElement("div")
 
     data.messages.forEach(message => {
-        
-        if (message.nickname === nickname){
+        const msgcont = document.createElement("li")
+        const msgNickName = document.createElement("div")
+        const msgText = document.createElement("div")
+
+        if (message.sender_username === nickname){
             msgcont.classList.add("msgcont-me")
-            msgNickName.textContent = message.nickname
+            msgNickName.textContent = message.sender_username
             msgText.textContent = message.content
             msgcont.appendChild(msgNickName)
             msgcont.appendChild(msgText)
         }else {
             msgcont.classList.add("msgcont-other")
-            msgNickName.textContent = message.nickname
+            msgNickName.textContent = message.sender_username
             msgText.textContent = message.content
             msgcont.appendChild(msgNickName)
             msgcont.appendChild(msgText)
         }
-        
-    });
 
-
-     
-     messagesList.appendChild(msgcont)
+        messagesList.appendChild(msgcont)
+    });    
  }
+
 
  if(!nickname){
     nickname = "Anonymous"
@@ -74,6 +72,7 @@ socket.on("message", (data)=>{
     const msgText = document.createElement("div")
 
     if (nickname == data.sender){
+        console.log(data)
         msgcont.classList.add("msgcont-me")
         msgNickName.textContent = data.sender
         msgText.textContent = data.message

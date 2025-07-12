@@ -15,7 +15,7 @@ joinBtn.addEventListener("click", (event) => {
         
         //making sure that chat exist
         socket.emit("chatCheck", {
-         roomID: room.value});
+        roomID: room.value});
             
         socket.on("chatCheck", (data)=>{ 
             if (data.chatFlag){
