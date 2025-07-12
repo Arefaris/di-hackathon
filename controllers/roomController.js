@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { createChat } from '../models/chatModel.js';
+import { createChat, getChatByGUID } from '../models/chatModel.js';
 import { addParticipant } from '../models/chatParticipantModel.js'
-import { getChatByGUID } from '../models/chatModel.js'
 import { getMessagesForChat } from '../models/messageModel.js'
-import { createUser } from '../models/userModel.js'
+import { createUser, findUserByUsername } from '../models/userModel.js'
 
 export function handleRoomEvents(io, socket) {
   socket.on('create', async ({ nickname, roomname }) => {
@@ -34,7 +33,18 @@ export function handleRoomEvents(io, socket) {
       socket.emit('error', { message: 'Chat not found' });
       return;
     }
+
+    let user = await findUserByUsername(nickname);
+    if (!user){
+      user = await createUser({username: nickname, password_hash: "passHash2"});
+    }
+    console.log(user);
+    
+    await addParticipant({ chat_id: chat.id, user_id: user.id });
+
     const messages = await getMessagesForChat(chat.id);
+    console.log(messages);
+    
     socket.join(roomID);
     socket.emit('joined', { roomID, nickname, messages });
   });

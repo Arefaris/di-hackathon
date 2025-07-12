@@ -1,11 +1,17 @@
 import db from '../config/db.js';
 
 export async function addParticipant({ chat_id, user_id }) {
-  console.log(chat_id, user_id);
-  
-  return await db('chat_participants')
-    .insert({ chat_id, user_id })
-    .returning('*');
+  const exists = await db('chat_participants')
+    .where({ chat_id, user_id })
+    .first();
+
+  if (!exists) {
+    return db('chat_participants')
+      .insert({ chat_id, user_id })
+      .returning('*');
+  }
+
+  return exists;
 }
 
 export async function getParticipantsByChatId(chat_id) {
