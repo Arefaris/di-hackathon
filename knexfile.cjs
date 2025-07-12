@@ -1,11 +1,11 @@
+console.log('knexfile.cjs is being loaded!');
 const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config();
 
-// Configure Neon-based database connection using connection string from .env
 const connectionString = process.env.DATABASE_URL;
-
+const knex = 
 module.exports = {
   development: {
     client: 'pg',
@@ -16,10 +16,10 @@ module.exports = {
       }
     },
     migrations: {
-      directory: path.join(__dirname, '../migrations')
+      directory: path.join(__dirname, './config/migrations')
     },
     seeds: {
-      directory: path.join(__dirname, '../seeds')
+      directory: path.join(__dirname, './config/seeds')
     }
   }
 };
