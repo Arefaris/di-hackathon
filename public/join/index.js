@@ -2,6 +2,7 @@ const joinBtn = document.querySelector(".join")
 const nickname = document.querySelector(".nickname")
 const room = document.querySelector(".room")
 
+
 joinBtn.addEventListener("click", (event) => {
     event.preventDefault()
     
@@ -11,13 +12,15 @@ joinBtn.addEventListener("click", (event) => {
         localStorage.setItem("nickname", `${nickname.value}`);
 
         const socket = io();
-
-        socket.emit("join", {
+        
+        //making sure that chat exist
+        socket.emit("chatCheck", {
          roomID: room.value});
             
-        socket.on("joined", (data)=>{ 
-            console.log(data)
-            //window.location.href = `/chat/?id=${chatID}`
+        socket.on("checked", (data)=>{ 
+            
+            localStorage.setItem("exist", data.messages);
+            window.location.href = `/chat/?id=${data.roomID}`
         })
     }
 })
