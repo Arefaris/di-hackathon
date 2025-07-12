@@ -7,6 +7,7 @@ const searchParams = new URLSearchParams(paramsString);
 const roomID = searchParams.get("id")
 const nickname = localStorage.getItem("nickname");
 
+
  socket.emit("join", {
          roomID: roomID});
  
