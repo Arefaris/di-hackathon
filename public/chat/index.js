@@ -23,15 +23,15 @@ const nickname = localStorage.getItem("nickname");
         const msgNickName = document.createElement("div")
         const msgText = document.createElement("div")
 
-        if (message.sender_username === nickname){
+        if (message.sender === nickname){
             msgcont.classList.add("msgcont-me")
-            msgNickName.textContent = message.sender_username
-            msgText.textContent = message.content
+            msgNickName.textContent = message.sender
+            msgText.textContent = message.message
             msgcont.appendChild(msgNickName)
             msgcont.appendChild(msgText)
         }else {
             msgcont.classList.add("msgcont-other")
-            msgNickName.textContent = message.sender_username
+            msgNickName.textContent = message.sender
             msgText.textContent = message.content
             msgcont.appendChild(msgNickName)
             msgcont.appendChild(msgText)
