@@ -1,21 +1,24 @@
 import express from 'express';
 import session from 'express-session';
 import pgSession from 'connect-pg-simple';
+
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { setupSocket } from './socket/index.js';
-import userRouter from './routes/userRouter.js';
-import db from './config/db.js';
-import pg from 'pg';
+
 import pool from './config/pool.js';
-import dotenv from 'dotenv';
+import userRouter from './routes/userRouter.js';
+import pagesRouter from './routes/pagesRouter.js';
+
 dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -30,8 +33,9 @@ const app = express();
 const pgSessionStore = pgSession(session); // initialize session storage
 
 app.use(helmet());
-app.use(cors({origin: process.env.ORIGIN_URL,
-    credentials: true
+app.use(cors({
+  origin: process.env.ORIGIN_URL,
+  credentials: true
 }));
 app.use(compression());
 app.use(morgan('dev'));
@@ -42,7 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 // Settings express-session middleware
 app.use(session({
   store: new pgSessionStore({
-    pool, 
+    pool,
     tableName: 'session',
   }),
   secret: process.env.SESSION_SECRET,
@@ -56,8 +60,9 @@ app.use(session({
   }
 }));
 
-// Connect user router
+// Connect routes
 app.use(userRouter);
+app.use(pagesRouter);
 
 // Base error handling
 app.use((err, req, res, next) => {
