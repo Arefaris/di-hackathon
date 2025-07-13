@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
         }
 
         const existingUser = await getUserByUsername(username);
-        
+
         if (existingUser) {
             return res.status(409).json({ msg: "Username already taken." });
         }
@@ -37,6 +37,7 @@ export const loginUser = async (req, res) => {
         }
 
         const user = await getUserByUsername(username);
+
         if (!user) {
             return res.status(401).json({ msg: "Invalid credentials." });
         }
@@ -46,16 +47,40 @@ export const loginUser = async (req, res) => {
             return res.status(401).json({ msg: "Invalid credentials." });
         }
 
+        //Save user data in a session
         req.session.userId = user.id;
         req.session.username = user.username;
-        req.session.isLoggedIn = true; // Можно добавить флаг
-        req.session.save(); // Обязательно сохраняем сессию
+        req.session.isLoggedIn = true;
+        req.session.save();
 
         res.status(200).json({ msg: "Login successful", user: { id: user.id, username: user.username } });
     } catch (err) {
         console.error(err);
         res.status(500).json({ msg: "Failed to log in." });
     }
+};
+
+export const logoutUser = async (req, res) => {
+    try {
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error destroying session:", err);
+                return res.status(500).json({ msg: "Failed to log out." });
+            }
+            res.clearCookie('connect.sid');
+            res.status(200).json({ msg: "Logout successful" });
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: "Failed to log out." });
+    }
+};
+
+export const requireAuth = (req, res, next) => {
+    if (!req.session || !req.session.isLoggedIn) {
+        return res.status(401).json({ msg: "Unauthorized" });
+    }
+    next();
 };
 
 export const getAllUsersHandler = async (req, res) => {

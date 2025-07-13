@@ -69,6 +69,24 @@ const server = createServer(app);
 const io = new Server(server, {
   connectionStateRecovery: {},
 });
+
+// Middleware for using sessions with Socket.IO 
+io.engine.use(session({
+  store: new pgSessionStore({
+    pool: pool,
+    tableName: 'session'
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
+}));
+
 app.use(express.static(join(__dirname, "public")));
 setupSocket(io);
 
