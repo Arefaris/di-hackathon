@@ -6,16 +6,18 @@ const paramsString = window.location.search
 const searchParams = new URLSearchParams(paramsString);
 const roomID = searchParams.get("id") //TODO move this to local host
 const nickname = localStorage.getItem("nickname");
-// add scroll chat
 
- socket.emit("join", {
-         roomID: roomID,
-         nickname: nickname});
+
+//  socket.emit("join", {
+//          roomID: roomID,
+//          nickname: nickname});
  
- socket.on("joined", (data)=>{ 
-    renderHistory(data)
- })
+//  socket.on("joined", (data)=>{ 
+//     renderHistory(data)
+//  })
 
+
+ 
 //TODO: make this one function
 // REFACTOR LATER
  const renderHistory = (data)=>{
@@ -41,6 +43,7 @@ const nickname = localStorage.getItem("nickname");
         }
 
         messagesList.appendChild(msgcont)
+        msgcont.scrollIntoView({ behavior: 'smooth' })
     });    
  }
 
@@ -48,6 +51,7 @@ const nickname = localStorage.getItem("nickname");
  if(!nickname){
     nickname = "Anonymous"
 }
+
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -88,7 +92,7 @@ socket.on("message", (data)=>{
         msgcont.appendChild(msgNickName)
         msgcont.appendChild(msgText)
     }
-     
-     
      messagesList.appendChild(msgcont)
+     msgcont.scrollIntoView({ behavior: 'smooth' })
+     
 })

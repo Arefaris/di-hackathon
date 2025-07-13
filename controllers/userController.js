@@ -37,7 +37,6 @@ export const loginUser = async (req, res) => {
         }
 
         const user = await getUserByUsername(username);
-        console.log(user);
 
         if (!user) {
             return res.status(401).json({ msg: "Invalid credentials." });
