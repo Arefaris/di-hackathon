@@ -2,9 +2,11 @@ import express from 'express';
 import {
   registerUser,
   loginUser,
+  logoutUser,
   getAllUsersHandler,
   getUserByIdHandler,
   updateUserByIdHandler,
+  requireAuth
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -15,16 +17,16 @@ router.post('/register', registerUser);
 // POST /login: Allow users to login by providing their username and password. Compare the hashed password from the JSON file with the provided password.
 router.post('/login', loginUser);
 
-// POST /logut: Allow users to logout
-// router.post('/logout', logoutUser);
+// POST /logout: Log the user out by destroying their session and clearing the session cookie.
+router.post('/logout', logoutUser);
 
 // GET /users: Retrieve a list of all registered users from the database
-router.get('/users', getAllUsersHandler);
+router.get('/users', requireAuth, getAllUsersHandler);
 
 // GET /users/:id: Retrieve a specific user by ID from the database
-router.get('/users/:id', getUserByIdHandler);
+router.get('/users/:id', requireAuth, getUserByIdHandler);
 
 // PUT /users/:id: Update a user’s information by ID in the database
-router.put('/users/:id', updateUserByIdHandler);
+router.put('/users/:id', requireAuth, updateUserByIdHandler);
 
 export default router;
