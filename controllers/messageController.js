@@ -4,7 +4,7 @@ import { createMessage } from '../models/messageModel.js'
 import { getChatByGUID } from '../models/chatModel.js'
 
 export function handleChatEvents(io, socket, userId, username) {
-    socket.on('message', async ({ sender, message, roomID }) => { //TODO: Remove sender on front and here
+    socket.on('message', async ({ message, roomID }) => {
         if (!roomID || !message) {
             return socket.emit('error', { message: 'Missing roomID or message' });
         }
@@ -17,10 +17,6 @@ export function handleChatEvents(io, socket, userId, username) {
             }
             await createMessage({ chat_id: chat.id, sender_id: userId, content: message });
 
-            // legacy
-            // const user = await getUserByUsername(sender);
-            // await createMessage({ chat_id: chat.id, sender_id: user.id, content: message })
-            // socket.join(roomID);
             io.to(roomID).emit('message', {
                 sender: username,
                 message

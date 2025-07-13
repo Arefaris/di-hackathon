@@ -1,13 +1,5 @@
+import './config/env.js'; // Load environment variables
 import express from 'express';
-import session from 'express-session';
-import pgSession from 'connect-pg-simple';
-
-import helmet from 'helmet';
-import cors from 'cors';
-import compression from 'compression';
-import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
@@ -16,85 +8,48 @@ import { dirname, join } from 'node:path';
 import { setupSocket } from './socket/index.js';
 
 import pool from './config/pool.js';
+import sessionMiddleware from './middleware/sessionConfig.js';
+import commonMiddleware from './middleware/commonMiddleware.js';
+import errorHandler from './middleware/errorHandler.js';
+
 import userRouter from './routes/userRouter.js';
 import pagesRouter from './routes/pagesRouter.js';
 
-dotenv.config();
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // not more than 100 requests 
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
 const app = express();
-const pgSessionStore = pgSession(session); // initialize session storage
 
-app.use(helmet());
-app.use(cors({
-  origin: process.env.ORIGIN_URL,
-  credentials: true
-}));
-app.use(compression());
-app.use(morgan('dev'));
-app.use(limiter);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Apply basic middlewares (JSON parser, CORS, etc.)
+commonMiddleware(app);
 
-// Settings express-session middleware
-app.use(session({
-  store: new pgSessionStore({
-    pool,
-    tableName: 'session',
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24,
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: 'lax'
-  }
-}));
+// Set up session handling
+app.use(sessionMiddleware(pool));
 
-// Connect routes
+// Serve static files (e.g. frontend)
+app.use(express.static(join(__dirname, "public")));
+// Mount API and page routes
 app.use(userRouter);
 app.use(pagesRouter);
 
-// Base error handling
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Internal Server Error' });
-});
+// Global error handler
+app.use(errorHandler);
 
 const server = createServer(app);
+// Share session with Socket.IO
 const io = new Server(server, {
   connectionStateRecovery: {},
+  cors: {
+    origin: process.env.ORIGIN_URL,
+    credentials: true
+  }
 });
 
 // Middleware for using sessions with Socket.IO 
-io.engine.use(session({
-  store: new pgSessionStore({
-    pool: pool,
-    tableName: 'session'
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
-  }
-}));
-
-app.use(express.static(join(__dirname, "public")));
+io.engine.use(sessionMiddleware(pool));
+// Register socket event handlers
 setupSocket(io);
 
+// Start HTTP + WebSocket server
+const PORT = process.env.PORT || 3000;
 server.listen(3000, '0.0.0.0', () => {
-  console.log('server running at http://localhost:3000');
+  console.log(`Server running at http://localhost:${PORT}`);
 });

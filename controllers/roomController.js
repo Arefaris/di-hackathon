@@ -55,22 +55,23 @@ export function handleRoomEvents(io, socket, userId, username) {
     }
   });
 
-  socket.on('chatCheck', async ({ roomID }) => {
-    if (!roomID) {
-      return socket.emit('error', { message: 'Room name is required.' });
-    }
-    if (!userId) { // Authentication check
-      return socket.emit('error', { message: 'Unauthorized: User not logged in.' });
-    }
-    try {
-      const chat = await getChatByGUID(roomID);
-      const chatFlag = Boolean(chat);
-      socket.emit('chatCheck', { chatFlag });
-    } catch (error) {
-      console.error('Error in chatCheck:', error);
-      socket.emit('chatCheck', { chatFlag: false });
-    }
-  });
+  // LEGACY
+  // socket.on('chatCheck', async ({ roomID }) => {
+  //   if (!roomID) {
+  //     return socket.emit('error', { message: 'Room name is required.' });
+  //   }
+  //   if (!userId) { // Authentication check
+  //     return socket.emit('error', { message: 'Unauthorized: User not logged in.' });
+  //   }
+  //   try {
+  //     const chat = await getChatByGUID(roomID);
+  //     const chatFlag = Boolean(chat);
+  //     socket.emit('chatCheck', { chatFlag });
+  //   } catch (error) {
+  //     console.error('Error in chatCheck:', error);
+  //     socket.emit('chatCheck', { chatFlag: false });
+  //   }
+  // });
 
   socket.on('chatsList', async () => {
     if (!userId) { // Authentication check
