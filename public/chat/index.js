@@ -10,12 +10,21 @@ const confirmJoinBtn = document.querySelector(".join-chat")
 const closeBtn = document.querySelector(".close-btn")
 const roomNameInput = document.querySelector(".room-name-input")
 let currentRoom = ""
-// where to get nickname?
+
 
  
 socket.on("joined", (data)=>{ 
     messagesList.innerHTML = ""
-    console.log(data)
+    
+    //making nodelist into array
+    const rooms = [...document.querySelectorAll(".room")]
+
+    //if current room exist
+    const index = rooms.findIndex(room => room.firstChild.innerHTML == data.name)
+  
+    if(index === -1){
+        renderChats([data])
+    }
     renderHistory(data)
  })
 
