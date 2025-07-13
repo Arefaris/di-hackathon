@@ -1,188 +1,131 @@
 const socket = io();
-const form = document.getElementById('form');
-const input = document.getElementById('input');
-const messagesList = document.getElementById("messages")
 const nickname = localStorage.getItem("nickname");
-const chatsEl = document.querySelector(".chats")
-const modal = document.getElementById('modal');
-const modalCreate = document.getElementById("modal-create")
-const joinBtn = document.querySelector(".join")
-const confirmJoinBtn = document.querySelector(".join-chat")
-const closeBtn = document.querySelector(".close-btn")
-const closeBtnCreate = document.querySelector(".close-btn-create")
-const roomNameInput = document.querySelector(".room-name-input")
-const roomNameInputCreate = document.querySelector(".room-name-input-create")
+let currentRoom = "";
 
-const createBtn = document.querySelector(".create")
-const confirmCreate = document.querySelector(".join-chat-create")
-let currentRoom = ""
- 
-socket.on("joined", (data)=>{ 
-    messagesList.innerHTML = ""
-    
-    //making nodelist into array
-    const rooms = [...document.querySelectorAll(".room")]
+//DOM Elements
+const form = document.getElementById("form");
+const input = document.getElementById("input");
+const messagesList = document.getElementById("messages");
+const chatsEl = document.querySelector(".chats");
 
-    //if current room exist
-    const index = rooms.findIndex(room => room.firstChild.innerHTML == data.name)
-  
-    if(index === -1){
-        renderChats([data])
-    }
-    renderHistory(data)
- })
+const modalJoin = document.getElementById("modal-join");
+const modalCreate = document.getElementById("modal-create");
 
+const openJoinBtn = document.querySelector(".open-join-modal");
+const openCreateBtn = document.querySelector(".open-create-modal");
+const closeBtns = document.querySelectorAll(".close-btn");
 
-socket.emit("chatsList")
+const joinRoomInput = document.getElementById("join-room-input");
+const createRoomInput = document.getElementById("create-room-input");
 
-socket.on("error", (data)=>{
-    console.log(data)
-})
+const confirmJoinBtn = document.querySelector(".confirm-join");
+const confirmCreateBtn = document.querySelector(".confirm-create");
 
-socket.on("chatsList", (data)=>{
-    console.log(data)
-    chatsEl.innerHTML = ""
-    renderChats(data)
-})
+//Event listeners
+openJoinBtn.addEventListener("click", () => toggleModal(modalJoin, true));
+openCreateBtn.addEventListener("click", () => toggleModal(modalCreate, true));
+closeBtns.forEach(btn =>
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.modal;
+    toggleModal(document.getElementById(id), false);
+  })
+);
 
-const renderChats = (data)=>{
-    
-    data.forEach(chat =>{
-        const room = document.createElement("div")
-        room.classList.add("room")
-        const title = document.createElement("div")
-        title.textContent = chat.name
-        room.appendChild(title)
-        joinEvent(room, chat.guid)
-        chatsEl.appendChild(room)
-    })
-}
-
-joinBtn.addEventListener("click", ()=>{openModal(modal)})
-
-closeBtn.addEventListener("click", ()=>{closeModal(modal)})
-
-closeBtnCreate.addEventListener("click", ()=>{closeModal(modalCreate)})
-
-createBtn.addEventListener("click", ()=>{openModal(modalCreate)})
-
-confirmCreate.addEventListener("click", (event)=> {createRoom(event)})
-
-const createRoom = (event)=>{
-    event.preventDefault()
-    if (roomNameInputCreate.value) {
-
-        socket.emit("create", {
-            nickname: nickname.value,
-            roomname: roomNameInputCreate.value
-        });
-
-        socket.on("created", (data) => {
-
-            //refactor to get data
-            location.reload()
-        })
-
-    }
-}
-
-function openModal(modal) {
-      modal.classList.add('active');
-    }
-
-function closeModal(modal) {
-      modal.classList.remove('active');
-    }
-
-function closeModal(modal) {
-      modal.classList.remove('active');
-    }
-
-const joinEvent = (room, guid)=>{
-    room.addEventListener("click", ()=>{
-        socket.emit("join", {
-        roomID: guid});
-        currentRoom = guid
-    })
-}
- 
-confirmJoinBtn.addEventListener("click", (event) => {
-    event.preventDefault()
-    
-    if (roomNameInput.value) {
-        socket.emit("join", {
-        roomID: roomNameInput.value});
-        closeModal()
-
-    }
-
-})
-
-
-//TODO: make this one function
-// REFACTOR LATER
- const renderHistory = (data)=>{
-
-    data.messages.forEach(message => {
-        const msgcont = document.createElement("li")
-        const msgNickName = document.createElement("div")
-        const msgText = document.createElement("div")
-   
-        if (message.sender === nickname){
-            msgcont.classList.add("msgcont-me")
-            msgNickName.textContent = message.sender
-            msgText.textContent = message.message
-            msgcont.appendChild(msgNickName)
-            msgcont.appendChild(msgText)
-        }else {
-            msgcont.classList.add("msgcont-other")
-            msgNickName.textContent = message.sender
-            msgText.textContent = message.message
-            msgcont.appendChild(msgNickName)
-            msgcont.appendChild(msgText)
-        }
-
-        messagesList.appendChild(msgcont)
-        msgcont.scrollIntoView({ behavior: 'smooth' })
-    });    
- }
-
-
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    console.log(currentRoom)
-    if (input.value) {
-        socket.emit("message", {
-            message: input.value,
-            roomID: currentRoom
-        });
-        
-        input.value = '';
-    }
+confirmJoinBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  const roomID = joinRoomInput.value.trim();
+  if (roomID) {
+    socket.emit("join", { roomID });
+    toggleModal(modalJoin, false);
+  }
 });
 
+confirmCreateBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  const roomname = createRoomInput.value.trim();
+  if (roomname) {
+    socket.emit("create", { nickname, roomname });
+    socket.once("created", () => location.reload());
+  }
+});
 
-//reciving message from server
-socket.on("message", (data)=>{
-    console.log(data)
-    const msgcont = document.createElement("li")
-    const msgNickName = document.createElement("div")
-    const msgText = document.createElement("div")
-    
-    if (nickname == data.sender){
-        msgcont.classList.add("msgcont-me")
-        msgNickName.textContent = data.sender
-        msgText.textContent = data.message
-        msgcont.appendChild(msgNickName)
-        msgcont.appendChild(msgText)
-    }else {
-        msgcont.classList.add("msgcont-other")
-        msgNickName.textContent = data.sender
-        msgText.textContent = data.message
-        msgcont.appendChild(msgNickName)
-        msgcont.appendChild(msgText)
-    }
-     messagesList.appendChild(msgcont)
-     msgcont.scrollIntoView({ behavior: 'smooth' })
-     
-})
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (input.value.trim()) {
+    socket.emit("message", {
+      message: input.value,
+      roomID: currentRoom
+    });
+    input.value = "";
+  }
+});
+
+//Socket Events
+socket.emit("chatsList");
+
+socket.on("joined", (data) => {
+  currentRoom = data.guid;
+  messagesList.innerHTML = "";
+  appendChatIfNotExists(data);;
+  renderMessages(data.messages);
+});
+
+socket.on("chatsList", renderChats);
+
+socket.on("message", renderMessage);
+
+socket.on("error", console.error);
+
+//Rendering
+function renderChats(chats) {
+  chatsEl.innerHTML = "";
+  chats.forEach(({ name, guid }) => {
+    const room = document.createElement("div");
+    room.classList.add("room");
+    room.textContent = name;
+    room.addEventListener("click", () => {
+      currentRoom = guid;
+      socket.emit("join", { roomID: guid });
+    });
+    chatsEl.appendChild(room);
+  });
+}
+
+function appendChatIfNotExists(chat) {
+  const exists = [...document.querySelectorAll(".room")].some(room =>
+    room.textContent === chat.name
+  );
+  if (!exists) {
+    const room = document.createElement("div");
+    room.classList.add("room");
+    room.textContent = chat.name;
+    room.addEventListener("click", () => {
+      currentRoom = chat.guid;
+      socket.emit("join", { roomID: chat.guid });
+    });
+    chatsEl.appendChild(room);
+  }
+}
+
+
+function renderMessages(messages) {
+  messages.forEach(renderMessage);
+}
+
+function renderMessage({ sender, message }) {
+  const li = document.createElement("li");
+  li.className = sender === nickname ? "msgcont-me" : "msgcont-other";
+
+  const name = document.createElement("div");
+  name.textContent = sender;
+  const text = document.createElement("div");
+  text.textContent = message;
+
+  li.append(name, text);
+  messagesList.appendChild(li);
+  li.scrollIntoView({ behavior: "smooth" });
+}
+
+function toggleModal(modal, show) {
+  modal.classList.toggle("active", show);
+}

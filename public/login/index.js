@@ -32,11 +32,11 @@ loginBtnEl.addEventListener("click", async(event)=>{
 
 
            if (response.status === 200){
-            const data = await response.json()
-            errorMsg.style.display = "none"
-            msg.textContent = data.msg
-            localStorage.setItem("nickname", data.user.username);
-            window.location.href = "/chat/"
+              const data = await response.json()
+              errorMsg.style.display = "none"
+              msg.textContent = data.msg
+              localStorage.setItem("nickname", data.user.username);
+              window.location.href = "/chat/"
            }
            
 
