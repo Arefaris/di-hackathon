@@ -8,14 +8,18 @@ import {
   updateUserByIdHandler,
   requireAuth
 } from '../controllers/userController.js';
+import {
+    validateUsernameAndPassword,
+    validateUpdate
+} from '../middleware/validation.js';
 
 const router = express.Router();
 
 // POST /register: Allow users to register by providing a username and password. Hash the password using bcrypt before storing it in the database
-router.post('/register', registerUser);
+router.post('/register', validateUsernameAndPassword, registerUser);
 
 // POST /login: Allow users to login by providing their username and password. Compare the hashed password from the JSON file with the provided password.
-router.post('/login', loginUser);
+router.post('/login', validateUsernameAndPassword, loginUser);
 
 // POST /logout: Log the user out by destroying their session and clearing the session cookie.
 router.post('/logout', logoutUser);
@@ -27,6 +31,6 @@ router.get('/users', requireAuth, getAllUsersHandler);
 router.get('/users/:id', requireAuth, getUserByIdHandler);
 
 // PUT /users/:id: Update a user’s information by ID in the database
-router.put('/users/:id', requireAuth, updateUserByIdHandler);
+router.put('/users/:id', requireAuth, validateUpdate, updateUserByIdHandler);
 
 export default router;
