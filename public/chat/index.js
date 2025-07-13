@@ -5,13 +5,17 @@ const messagesList = document.getElementById("messages")
 const nickname = localStorage.getItem("nickname");
 const chatsEl = document.querySelector(".chats")
 const modal = document.getElementById('modal');
+const modalCreate = document.getElementById("modal-create")
 const joinBtn = document.querySelector(".join")
 const confirmJoinBtn = document.querySelector(".join-chat")
 const closeBtn = document.querySelector(".close-btn")
+const closeBtnCreate = document.querySelector(".close-btn-create")
 const roomNameInput = document.querySelector(".room-name-input")
+const roomNameInputCreate = document.querySelector(".room-name-input-create")
+
+const createBtn = document.querySelector(".create")
+const confirmCreate = document.querySelector(".join-chat-create")
 let currentRoom = ""
-
-
  
 socket.on("joined", (data)=>{ 
     messagesList.innerHTML = ""
@@ -54,19 +58,41 @@ const renderChats = (data)=>{
     })
 }
 
-joinBtn.addEventListener("click", openModal)
+joinBtn.addEventListener("click", ()=>{openModal(modal)})
 
-closeBtn.addEventListener("click", closeModal)
+closeBtn.addEventListener("click", ()=>{closeModal(modal)})
 
-function openModal() {
+closeBtnCreate.addEventListener("click", ()=>{closeModal(modalCreate)})
+
+createBtn.addEventListener("click", ()=>{openModal(modalCreate)})
+
+confirmCreate.addEventListener("click", (event)=> {createRoom(event)})
+
+const createRoom = (event)=>{
+    event.preventDefault()
+    if (roomNameInputCreate.value) {
+
+        socket.emit("create", {
+            nickname: nickname.value,
+            roomname: roomNameInputCreate.value
+        });
+
+        socket.on("created", (data) => {
+            location.reload()
+        })
+
+    }
+}
+
+function openModal(modal) {
       modal.classList.add('active');
     }
 
-function closeModal() {
+function closeModal(modal) {
       modal.classList.remove('active');
     }
 
-function closeModal() {
+function closeModal(modal) {
       modal.classList.remove('active');
     }
 
@@ -76,9 +102,6 @@ const joinEvent = (room, guid)=>{
         roomID: guid});
         currentRoom = guid
     })
-
-   
-
 }
  
 confirmJoinBtn.addEventListener("click", (event) => {
@@ -135,6 +158,7 @@ form.addEventListener('submit', (e) => {
         input.value = '';
     }
 });
+
 
 //reciving message from server
 socket.on("message", (data)=>{
