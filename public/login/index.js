@@ -35,6 +35,7 @@ loginBtnEl.addEventListener("click", async(event)=>{
             const data = await response.json()
             errorMsg.style.display = "none"
             msg.textContent = data.msg
+            localStorage.setItem("nickname", data.user.username);
             window.location.href = "/chat/"
            }
            
