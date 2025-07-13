@@ -163,7 +163,7 @@ body {
 
 }
 
-.room-name-input {
+.room-name-input, .room-name-input-create {
   font-family: inherit;
   font-weight: 500;
   color: white;
@@ -177,7 +177,7 @@ body {
   box-sizing: border-box;
 }
 
- .modal-overlay {
+ .modal-overlay, .modal-overlay-create {
       position: fixed;
       top: 0;
       left: 0;
@@ -198,7 +198,12 @@ body {
       opacity: 1;
     }
 
-    .modal {
+    .modal-overlay-create.active {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal, .modal-create {
       background: rgb(28, 28, 30);
       padding: 20px;
       border-radius: 12px;
@@ -207,7 +212,7 @@ body {
       min-width: 300px;
     }
 
-    .close-btn {
+    .close-btn, .close-btn-create {
       position: absolute;
       top: 10px;
       right: 10px;
