@@ -1,4 +1,5 @@
 import express from 'express';
+import session from 'express-session';knex migrate:make create_sessions_table
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
