@@ -1,14 +1,14 @@
-const createBtnEl = document.querySelector(".create")
-const joinBtnEl = document.querySelector(".join")
+const registerBtnEl = document.querySelector(".register")
+const loginBtnEl = document.querySelector(".login")
 
-createBtnEl.addEventListener("click", (event)=>{
+registerBtnEl.addEventListener("click", (event)=>{
     event.preventDefault()
 
-    window.location.href = "/create/"
+    window.location.href = "/reg/"
 })
 
-joinBtnEl.addEventListener("click", (event)=>{
+loginBtnEl.addEventListener("click", (event)=>{
     event.preventDefault()
 
-    window.location.href = "/join/"
+    window.location.href = "/login/"
 })

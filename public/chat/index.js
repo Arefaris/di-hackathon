@@ -6,15 +6,15 @@ const paramsString = window.location.search
 const searchParams = new URLSearchParams(paramsString);
 const roomID = searchParams.get("id") //TODO move this to local host
 const nickname = localStorage.getItem("nickname");
-// add scroll chat
 
- socket.emit("join", {
-         roomID: roomID,
-         nickname: nickname});
+
+//  socket.emit("join", {
+//          roomID: roomID,
+//          nickname: nickname});
  
- socket.on("joined", (data)=>{ 
-    renderHistory(data)
- })
+//  socket.on("joined", (data)=>{ 
+//     renderHistory(data)
+//  })
 
 
  

@@ -26,10 +26,9 @@ regBtnEl.addEventListener("click", async(event)=>{
             const data = await response.json()
             errorMsg.style.display = "none"
             msg.textContent = data.msg
+            window.location.href = "/chat/"
             
            }
-           
-
             
     }
 
