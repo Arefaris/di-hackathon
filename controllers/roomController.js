@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { createChat, getChatByGUID } from '../models/chatModel.js';
+import { createChat, getChatByGUID, getAllChatsByUserId } from '../models/chatModel.js';
 import { addParticipant } from '../models/chatParticipantModel.js'
 import { getMessagesForChat } from '../models/messageModel.js'
 import { createUser, getUserByUsername } from '../models/userModel.js'
@@ -77,6 +77,20 @@ export function handleRoomEvents(io, socket, userId, username) {
     } catch (error) {
       console.error('Error in chatCheck:', error);
       socket.emit('chatCheck', { chatFlag: false });
+    }
+  });
+
+  socket.on('chatsList', async () => {
+    if (!userId) { // Authentication check
+      return socket.emit('error', { message: 'Unauthorized: User not logged in.' });
+    }
+
+    try {
+      const chats = await getAllChatsByUserId(userId);
+      socket.emit('chatsList', chats);
+    } catch (error) {
+      console.error('Error in chatsList:', error);
+      socket.emit('chatsList', { message: "Failed to get chats." });
     }
   });
 }
