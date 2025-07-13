@@ -15,13 +15,13 @@ export const registerUser = async (req, res) => {
         }
 
         const existingUser = await getUserByUsername(username);
+        
         if (existingUser) {
             return res.status(409).json({ msg: "Username already taken." });
         }
 
         const password_hash = await bcrypt.hash(password, 10);
         const newUser = await createUser({ username, password_hash });
-
         res.status(201).json({ msg: "User registered", user: { id: newUser.id, username: newUser.username } });
     } catch (err) {
         console.error(err);
