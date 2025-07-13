@@ -20,8 +20,8 @@ export const registerUser = async (req, res) => {
         }
 
         const password_hash = await bcrypt.hash(password, 10);
-        const newUser = await createUser({ username, password_hash });
-
+        const [newUser] = await createUser({ username, password_hash });
+        
         res.status(201).json({ msg: "User registered", user: { id: newUser.id, username: newUser.username } });
     } catch (err) {
         console.error(err);
@@ -36,7 +36,7 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({ msg: "Username and password are required." });
         }
 
-        const user = await getUserByUsername(username);
+        const [user] = await getUserByUsername(username);
         if (!user) {
             return res.status(401).json({ msg: "Invalid credentials." });
         }
