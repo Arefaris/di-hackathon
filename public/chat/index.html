@@ -9,21 +9,21 @@
 </head>
 <body>
     <div class="container">
+
+    <div class="flex-chat">
+        <div>
+            <div class="join-cont">
+                <button class="button join">Join room</button>
+            </div>
+              
+            <button class="button create">Create room</button>
+        </div>
         
         <div class="chats">
-            <button class="button create">Create room</button>
-            <div class="room">
-                <div>Title</div>
-            </div>
-            <div class="room">
-                <div>Title</div>
-              
-            </div>
-            <div class="room">
-                <div>Title</div>
-            </div>
+         
+            
         </div>
-
+    </div>
         <div class="chat-area">
             <ul id="messages">
             </ul>
@@ -31,6 +31,15 @@
             <input id="input" class="chat-input" autocomplete="off" />
             <button>Send</button>
         </form>
+        </div>
+        <div class="modal-overlay" id="modal">
+            
+            <div class="modal">
+                  <button class="close-btn">X</button>
+                <input class="room-name-input" type="text" placeholder="Room name" />
+            <br />
+                <button class="button join-chat">Join</button>
+            </div>
         </div>
         </div>
 

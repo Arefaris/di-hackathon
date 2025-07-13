@@ -2,22 +2,89 @@ const socket = io();
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messagesList = document.getElementById("messages")
-const paramsString = window.location.search
-const searchParams = new URLSearchParams(paramsString);
-const roomID = searchParams.get("id") //TODO move this to local host
 const nickname = localStorage.getItem("nickname");
-
-
-//  socket.emit("join", {
-//          roomID: roomID,
-//          nickname: nickname});
- 
-//  socket.on("joined", (data)=>{ 
-//     renderHistory(data)
-//  })
-
+const chatsEl = document.querySelector(".chats")
+const modal = document.getElementById('modal');
+const joinBtn = document.querySelector(".join")
+const confirmJoinBtn = document.querySelector(".join-chat")
+const closeBtn = document.querySelector(".close-btn")
+const roomNameInput = document.querySelector(".room-name-input")
+let currentRoom = ""
+// where to get nickname?
 
  
+socket.on("joined", (data)=>{ 
+    messagesList.innerHTML = ""
+    console.log(data)
+    renderHistory(data)
+ })
+
+
+socket.emit("chatsList")
+
+socket.on("error", (data)=>{
+    console.log(data)
+})
+
+socket.on("chatsList", (data)=>{
+    console.log(data)
+    chatsEl.innerHTML = ""
+    renderChats(data)
+})
+
+const renderChats = (data)=>{
+    
+    data.forEach(chat =>{
+        const room = document.createElement("div")
+        room.classList.add("room")
+        const title = document.createElement("div")
+        title.textContent = chat.name
+        room.appendChild(title)
+        joinEvent(room, chat.guid)
+        chatsEl.appendChild(room)
+    })
+}
+
+joinBtn.addEventListener("click", openModal)
+
+closeBtn.addEventListener("click", closeModal)
+
+function openModal() {
+      modal.classList.add('active');
+    }
+
+function closeModal() {
+      modal.classList.remove('active');
+    }
+
+function closeModal() {
+      modal.classList.remove('active');
+    }
+
+const joinEvent = (room, guid)=>{
+    room.addEventListener("click", ()=>{
+        socket.emit("join", {
+        roomID: guid});
+        currentRoom = guid
+    })
+
+   
+
+}
+ 
+confirmJoinBtn.addEventListener("click", (event) => {
+    event.preventDefault()
+    
+    if (roomNameInput.value) {
+        socket.emit("join", {
+        roomID: roomNameInput.value});
+        closeModal()
+
+    }
+
+})
+
+
 //TODO: make this one function
 // REFACTOR LATER
  const renderHistory = (data)=>{
@@ -26,9 +93,8 @@ const nickname = localStorage.getItem("nickname");
         const msgcont = document.createElement("li")
         const msgNickName = document.createElement("div")
         const msgText = document.createElement("div")
-        console.log(message)
+   
         if (message.sender === nickname){
-            
             msgcont.classList.add("msgcont-me")
             msgNickName.textContent = message.sender
             msgText.textContent = message.message
@@ -48,23 +114,13 @@ const nickname = localStorage.getItem("nickname");
  }
 
 
- if(!nickname){
-    nickname = "Anonymous"
-}
-
-
 form.addEventListener('submit', (e) => {
     e.preventDefault();
-
-    if (!roomID){
-        alert("Room id is not correct")
-    }
-
+    console.log(currentRoom)
     if (input.value) {
         socket.emit("message", {
-            sender: nickname,
             message: input.value,
-            roomID: roomID
+            roomID: currentRoom
         });
         
         input.value = '';
@@ -73,13 +129,12 @@ form.addEventListener('submit', (e) => {
 
 //reciving message from server
 socket.on("message", (data)=>{
-     
+    console.log(data)
     const msgcont = document.createElement("li")
     const msgNickName = document.createElement("div")
     const msgText = document.createElement("div")
-
+    
     if (nickname == data.sender){
-        console.log(data)
         msgcont.classList.add("msgcont-me")
         msgNickName.textContent = data.sender
         msgText.textContent = data.message
