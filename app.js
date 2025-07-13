@@ -1,5 +1,6 @@
 import express from 'express';
 import session from 'express-session';
+import pgSession from 'connect-pg-simple';
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
@@ -11,6 +12,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { setupSocket } from './socket/index.js';
 import userRouter from './routes/userRouter.js';
+import db from './config/db.js';
+import pg from 'pg';
+import pool from './config/pool.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const limiter = rateLimit({
@@ -21,21 +27,43 @@ const limiter = rateLimit({
 });
 
 const app = express();
+const pgSessionStore = pgSession(session); // initialize session storage
+
 app.use(helmet());
-app.use(cors());
+app.use(cors({origin: process.env.ORIGIN_URL,
+    credentials: true
+}));
 app.use(compression());
 app.use(morgan('dev'));
 app.use(limiter);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Settings express-session middleware
+app.use(session({
+  store: new pgSessionStore({
+    pool, 
+    tableName: 'session',
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax'
+  }
+}));
+
+// Connect user router
+app.use(userRouter);
 
 // Base error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Internal Server Error' });
 });
-
-// Connect user router
-app.use(userRouter);
 
 const server = createServer(app);
 const io = new Server(server, {
