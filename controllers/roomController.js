@@ -2,10 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { createChat, getChatByGUID, getAllChatsByUserId } from '../models/chatModel.js';
 import { addParticipant } from '../models/chatParticipantModel.js'
 import { getMessagesForChat } from '../models/messageModel.js'
-import { createUser, getUserByUsername } from '../models/userModel.js'
 
 export function handleRoomEvents(io, socket, userId, username) {
-  socket.on('create', async ({ nickname, roomname }) => { //TODO: Remove nickname on front and here
+  socket.on('create', async ({ roomname }) => { //TODO: Remove nickname on front and here
     if (!roomname) {
       return socket.emit('error', { message: 'Room name is required.' });
     }
@@ -17,8 +16,6 @@ export function handleRoomEvents(io, socket, userId, username) {
       const roomID = uuidv4();
       const [chat] = await createChat({ name: roomname, type: 'group', guid: roomID });
 
-      // Legacy: Create user by nickname
-      // const user = await createUser({ username: nickname, password_hash: 'passHash#1' });
       await addParticipant({ chat_id: chat.id, user_id: userId });
 
       socket.join(roomID);
@@ -29,7 +26,7 @@ export function handleRoomEvents(io, socket, userId, username) {
     }
   });
 
-  socket.on('join', async ({ roomID, nickname }) => { //TODO: Remove nickname on front and here
+  socket.on('join', async ({ roomID }) => { //TODO: Remove nickname on front and here
     if (!roomID) {
       return socket.emit('error', { message: 'Room name is required.' });
     }
@@ -43,18 +40,13 @@ export function handleRoomEvents(io, socket, userId, username) {
         return;
       }
 
-      // Legacy: Create user by nickname
-      // let user = await getUserByUsername(nickname);
-      // if (!user) {
-      //   [user] = await createUser({ username: nickname, password_hash: "passHash2" });
-      // }
       await addParticipant({ chat_id: chat.id, user_id: userId });
 
       const messages = await getMessagesForChat(chat.id);
 
       socket.join(roomID);
       // Response with the chat history and the chat name
-      socket.emit('joined', { roomID, nickname: username, messages, chatName: chat.name });
+      socket.emit('joined', { roomID, nickname: username, messages, name: chat.name });
       // Notify other users about a new participant
       socket.to(roomID).emit('userJoined', { username: username });
     } catch (error) {
@@ -63,22 +55,23 @@ export function handleRoomEvents(io, socket, userId, username) {
     }
   });
 
-  socket.on('chatCheck', async ({ roomID }) => {
-    if (!roomID) {
-      return socket.emit('error', { message: 'Room name is required.' });
-    }
-    if (!userId) { // Authentication check
-      return socket.emit('error', { message: 'Unauthorized: User not logged in.' });
-    }
-    try {
-      const chat = await getChatByGUID(roomID);
-      const chatFlag = Boolean(chat);
-      socket.emit('chatCheck', { chatFlag });
-    } catch (error) {
-      console.error('Error in chatCheck:', error);
-      socket.emit('chatCheck', { chatFlag: false });
-    }
-  });
+  // LEGACY
+  // socket.on('chatCheck', async ({ roomID }) => {
+  //   if (!roomID) {
+  //     return socket.emit('error', { message: 'Room name is required.' });
+  //   }
+  //   if (!userId) { // Authentication check
+  //     return socket.emit('error', { message: 'Unauthorized: User not logged in.' });
+  //   }
+  //   try {
+  //     const chat = await getChatByGUID(roomID);
+  //     const chatFlag = Boolean(chat);
+  //     socket.emit('chatCheck', { chatFlag });
+  //   } catch (error) {
+  //     console.error('Error in chatCheck:', error);
+  //     socket.emit('chatCheck', { chatFlag: false });
+  //   }
+  // });
 
   socket.on('chatsList', async () => {
     if (!userId) { // Authentication check
