@@ -2,21 +2,43 @@ const socket = io();
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messagesList = document.getElementById("messages")
-const paramsString = window.location.search
-const searchParams = new URLSearchParams(paramsString);
-const roomID = searchParams.get("id") //TODO move this to local host
 const nickname = localStorage.getItem("nickname");
+const chatsEl = document.querySelector(".chats")
 
 
-//  socket.emit("join", {
-//          roomID: roomID,
-//          nickname: nickname});
  
-//  socket.on("joined", (data)=>{ 
-//     renderHistory(data)
-//  })
+socket.on("joined", (data)=>{ 
+    renderHistory(data)
+ })
 
 
+socket.emit("chatsList")
+
+socket.on("chatsList", (data)=>{
+    console.log(data)
+    renderChats(data)
+})
+
+const renderChats = (data)=>{
+    data.forEach(chat =>{
+        console.log(chat)
+        const room = document.createElement("div")
+        room.classList.add("room")
+        const title = document.createElement("div")
+        title.textContent = chat.name
+        room.appendChild(title)
+        joinEvent(room, chat.guid)
+        chatsEl.appendChild(room)
+    })
+}
+
+const joinEvent = (room, guid)=>{
+    room.addEventListener("click", ()=>{
+
+        socket.emit("join", {
+        roomID: guid});
+    })
+}
  
 //TODO: make this one function
 // REFACTOR LATER
