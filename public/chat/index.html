@@ -8,20 +8,24 @@
     
 </head>
 <body>
-    <ul id="messages">
-        <!-- <li class="msgcont-me">
-            <div class="nick-name-me">Felix</div>
-            <div class="msg-me">My message</div>
-        </li>
-         <li class="msgcont-other">
-            <div class="nick-name">Ilya</div>
-            <div class="msg-other">My message</div>
-        </li> -->
-       
-    </ul>
-    <form id="form">
-      <input id="input" class="chat-input" autocomplete="off" /><button>Send</button>
-    </form>
+    <div class="container">
+        <div class="chats">
+            <div class="room">Room 1</div>
+            <div class="room">Room 2</div>
+            <div class="room">Room 3</div>
+        </div>
+
+        <div class="chat-area">
+            <ul id="messages">
+            </ul>
+            <form id="form">
+            <input id="input" class="chat-input" autocomplete="off" />
+            <button>Send</button>
+        </form>
+        </div>
+        </div>
+
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="index.js"></script>
 </body>

@@ -36,7 +36,7 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({ msg: "Username and password are required." });
         }
 
-        const [user] = await getUserByUsername(username);
+        const user = await getUserByUsername(username);
         if (!user) {
             return res.status(401).json({ msg: "Invalid credentials." });
         }
