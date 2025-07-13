@@ -21,3 +21,11 @@ export async function getChatByGUID(guid) {
 export async function getAllChats() {
   return await db('chats').select('*');
 }
+
+
+export async function getAllChatsByUserId(user_id) {
+  return await db('chats')
+  .select('chats.id', 'chats.name', 'chats.guid', 'chats.created_at')
+  .join('chat_participants', 'chats.id', 'chat_participants.chat_id')
+  .where('chat_participants.user_id', user_id);
+}
