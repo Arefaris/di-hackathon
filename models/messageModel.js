@@ -11,10 +11,10 @@ export async function getMessagesForChat(chat_id) {
     .join('users', 'messages.sender_id', '=', 'users.id')
     .select(
       'messages.id',
-      'messages.content',
+      'messages.content as message',
       'messages.timestamp',
       'messages.chat_id',
-      'users.username as sender_username'
+      'users.username as sender'
     )
     .where('messages.chat_id', chat_id)
     .orderBy('messages.timestamp', 'asc');

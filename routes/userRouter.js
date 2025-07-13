@@ -4,7 +4,7 @@ import {
   loginUser,
   getAllUsersHandler,
   getUserByIdHandler,
-  updateUserByIdHandler
+  updateUserByIdHandler,
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -14,6 +14,9 @@ router.post('/register', registerUser);
 
 // POST /login: Allow users to login by providing their username and password. Compare the hashed password from the JSON file with the provided password.
 router.post('/login', loginUser);
+
+// POST /logut: Allow users to logout
+// router.post('/logout', logoutUser);
 
 // GET /users: Retrieve a list of all registered users from the database
 router.get('/users', getAllUsersHandler);

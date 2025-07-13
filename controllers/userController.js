@@ -46,6 +46,11 @@ export const loginUser = async (req, res) => {
             return res.status(401).json({ msg: "Invalid credentials." });
         }
 
+        req.session.userId = user.id;
+        req.session.username = user.username;
+        req.session.isLoggedIn = true; // Можно добавить флаг
+        req.session.save(); // Обязательно сохраняем сессию
+
         res.status(200).json({ msg: "Login successful", user: { id: user.id, username: user.username } });
     } catch (err) {
         console.error(err);
@@ -81,7 +86,7 @@ export const updateUserByIdHandler = async (req, res) => {
     console.log(req.body);
     const { id } = req.params;
     const { username, password } = req.body;
-    
+
     if (!username && !password) {
         return res.status(400).json({ msg: "Provide at least one field: username or password." });
     }

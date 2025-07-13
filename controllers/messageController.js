@@ -13,8 +13,7 @@ export function handleChatEvents(io, socket) {
         socket.join(roomID);
         io.to(roomID).emit('message', {
             sender,
-            message,
-            from: socket.id
+            message
         });
     });
 }
