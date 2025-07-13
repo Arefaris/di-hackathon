@@ -46,7 +46,7 @@ export function handleRoomEvents(io, socket, userId, username) {
 
       socket.join(roomID);
       // Response with the chat history and the chat name
-      socket.emit('joined', { roomID, nickname: username, messages, name: chat.name });
+      socket.emit('joined', { guid: roomID, nickname: username, messages, name: chat.name });
       // Notify other users about a new participant
       socket.to(roomID).emit('userJoined', { username: username });
     } catch (error) {
