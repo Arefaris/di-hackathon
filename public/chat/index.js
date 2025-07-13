@@ -4,9 +4,9 @@ const input = document.getElementById('input');
 const messagesList = document.getElementById("messages")
 const paramsString = window.location.search
 const searchParams = new URLSearchParams(paramsString);
-const roomID = searchParams.get("id")
+const roomID = searchParams.get("id") //TODO move this to local host
 const nickname = localStorage.getItem("nickname");
-
+// add scroll chat
 
  socket.emit("join", {
          roomID: roomID,
@@ -16,14 +16,17 @@ const nickname = localStorage.getItem("nickname");
     renderHistory(data)
  })
 
+//TODO: make this one function
+// REFACTOR LATER
  const renderHistory = (data)=>{
 
     data.messages.forEach(message => {
         const msgcont = document.createElement("li")
         const msgNickName = document.createElement("div")
         const msgText = document.createElement("div")
-
+        console.log(message)
         if (message.sender === nickname){
+            
             msgcont.classList.add("msgcont-me")
             msgNickName.textContent = message.sender
             msgText.textContent = message.message
@@ -32,7 +35,7 @@ const nickname = localStorage.getItem("nickname");
         }else {
             msgcont.classList.add("msgcont-other")
             msgNickName.textContent = message.sender
-            msgText.textContent = message.content
+            msgText.textContent = message.message
             msgcont.appendChild(msgNickName)
             msgcont.appendChild(msgText)
         }
