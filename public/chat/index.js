@@ -78,6 +78,8 @@ const createRoom = (event)=>{
         });
 
         socket.on("created", (data) => {
+
+            //refactor to get data
             location.reload()
         })
 
