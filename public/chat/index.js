@@ -88,13 +88,31 @@ socket.on("message", renderMessage);
 
 socket.on("error", console.error);
 
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true
+  } catch (err) {
+    console.error(err);
+    return false
+  }
+}
+
 //Rendering
 function renderChats(chats) {
   chatsEl.innerHTML = "";
   chats.forEach(({ name, guid }) => {
     const room = document.createElement("div");
+    const linkIcon = document.createElement("i")
+    linkIcon.classList.add("copy-room", "fa-solid", "fa-copy")
     room.classList.add("room");
     room.textContent = name;
+    room.appendChild(linkIcon)
+    
+    linkIcon.addEventListener("click", ()=>{
+      copyToClipboard(guid)
+    })
+
     room.addEventListener("click", () => {
       currentRoom = guid;
       chatHeader.textContent = name
@@ -145,15 +163,20 @@ function renderMessage({ sender, message, timestamp }) {
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
 
-  const name = document.createElement("div");
-  name.textContent = sender;
-  name.className = "name"
+  
+  if (sender === "msgcont-other") {
+    const name = document.createElement("div");
+    name.textContent = sender;
+    name.className = "name"
+    li.append(name)
+  }
+  
   const text = document.createElement("div");
   text.textContent = message;
   const time = document.createElement("div")
   time.textContent = `${hours}:${minutes}`
   time.className = "time-ms"
-  li.append(name, text, time);
+  li.append(text, time);
   messagesList.appendChild(li);
   li.scrollIntoView({ behavior: "smooth" });
 }

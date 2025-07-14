@@ -236,3 +236,11 @@ body {
   height: 50px;
 }
 
+.copy-room {
+  margin-left: 10px;
+}
+
+.copy-room:hover {
+  cursor: pointer;
+  color: #8774e1;
+}
