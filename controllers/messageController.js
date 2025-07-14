@@ -15,11 +15,11 @@ export function handleChatEvents(io, socket, userId, username) {
             if (!chat) {
                 return socket.emit('error', { message: 'Chat not found' });
             }
-            const [messageObj] = await createMessage({ chat_id: chat.id, sender_id: userId, content: message });
-
+            const [messageObj] = await createMessage({ chat_id: chat.id, sender_id: userId, content: message });            
             io.to(roomID).emit('message', {
                 sender: username,
-                message: messageObj
+                message: messageObj.content,
+                timestamp: messageObj.timestamp
             });
         } catch (error) {
             console.error('Error sending message:', error);
