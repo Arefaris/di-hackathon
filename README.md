@@ -14,50 +14,54 @@ Chat persistence with support for private and group chats
 
 Modular structure with routers, models, controllers, and middleware
 
-
 **Getting Started**
-Clone the repo:
+You can follow these instructions to get your project up and running locally.
 
-bash
-Copy
-Edit
-git clone https://github.com/yourusername/chat-app-server.git
-cd chat-app-server
-Install dependencies:
+**Clone the Repository**
+Clone the repository to your local machine:
 
-bash
-Copy
-Edit
+```
+git clone https://github.com/Arefaris/di-hackathon.git
+cd di-hackathon
+```
+
+**Install Dependencies**
+Install all necessary project dependencies:
+
+```
 npm install
-Set up environment variables:
+```
 
-Create a .env file in the root with the following:
+**Set Up Environment Variables**
+Create a `.env` file in the root directory of the project and populate it with the following variables:
 
-ini
-Copy
-Edit
-DATABASE_URL=your_neon_connection_string
-SESSION_SECRET=your_super_secret
-NODE_ENV=development
-ORIGIN_URL=http://localhost:3000
-Set up the database:
+```
+DATABASE_URL=your_neon_connection_string # Your PostgreSQL connection string (e.g., Neon DB)
+SESSION_SECRET=your_super_secret # Secret key for sessions (generate a strong one)
+NODE_ENV=development # Or 'production' for production environment
+ORIGIN_URL=http://localhost:3000 # Your frontend's URL if it's separate. Otherwise, this is the backend URL.
+```
 
-**Run migrations:**
+**Database Setup**
+_Run Migrations_
+Execute migrations to create the required database schema:
 
-bash
-Copy
-Edit
+```
 npx knex migrate:latest --knexfile ./knexfile.cjs
-Seed sample data (optional):
+```
 
-bash
-Copy
-Edit  
+**Seed Sample Data (Optional)**
+To add sample data for testing purposes, run the seed files:
+
+```
 npx knex seed:run --knexfile ./knexfile.cjs
-Start the server:
+```
 
-bash
-Copy
-Edit
+**Start the Server**
+After installing all dependencies and setting up the database, you can start the server:
+
+```
 npm start
-Your app will be running at http://localhost:3000
+```
+
+Your application will be running at: http://localhost:3000 (replace port number with the value from `.env` file)
