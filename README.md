@@ -2,12 +2,13 @@
 This is a Node.js + Express + Socket.IO backend for a simple real-time chat application with authentication and persistent chat storage using PostgreSQL.
 
 **Features**
-*User registration and login (username + password)
-*Session-based authentication using express-session
-*Socket.IO for real-time chat communication
-*PostgreSQL with knex.js for database queries
-*Chat persistence with history in the database
-*Modular structure with routers, models, controllers, and middleware
+
+* User registration and login (username + password)
+* Session-based authentication using express-session
+* Socket.IO for real-time chat communication
+* PostgreSQL with knex.js for database queries
+* Chat persistence with history in the database
+* Modular structure with routers, models, controllers, and middleware
 
 **Getting Started**
 
