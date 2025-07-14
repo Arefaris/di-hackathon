@@ -44,6 +44,7 @@ ORIGIN_URL=http://localhost:3000 # Your frontend's URL if it's separate. Otherwi
 ```
 
 **Database Setup**
+
 _Run Migrations_
 
 Execute migrations to create the required database schema:
