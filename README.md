@@ -1,4 +1,5 @@
 **Chat App**
+
 This is a Node.js + Express + Socket.IO backend for a simple real-time chat application with authentication and persistent chat storage using PostgreSQL.
 
 **Features**
