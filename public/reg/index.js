@@ -3,7 +3,7 @@ const loginInptEl = document.querySelector(".username")
 const password = document.querySelector(".password")
 const errorMsg = document.querySelector(".error")
 const msg = document.querySelector(".msg")
-
+// logout
 regBtnEl.addEventListener("click", async(event)=>{
     event.preventDefault()
     if(loginInptEl.value && password.value){
