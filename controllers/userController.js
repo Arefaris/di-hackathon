@@ -39,9 +39,9 @@ export const loginUser = async (req, res, next) => {
         req.session.userId = user.id;
         req.session.username = user.username;
         req.session.isLoggedIn = true;
+        req.session.cookie.expires = new Date(Date.now() + 86400000);
+        req.session.modified = true;
         await req.session.save();
-        console.log(req.session);
-        
         res.status(200).json({ msg: "Login successful", user: { id: user.id, username: user.username } });
     } catch (err) {
         next(err);
