@@ -9,6 +9,7 @@ loginBtnEl.addEventListener("click", async(event)=>{
     if(loginInptEl.value && password.value){
         const response = await fetch("/login", {
             method: "POST",
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json', 
             },

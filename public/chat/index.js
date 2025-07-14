@@ -56,7 +56,6 @@ confirmCreateBtn.addEventListener("click", (e) => {
             guid: chatID
         })
         toggleModal(modalCreate, false)
-        console.log(data)
     });
   }
 });
@@ -122,8 +121,9 @@ function appendChatIfNotExists(chat) {
     const room = document.createElement("div");
     room.classList.add("room");
     room.textContent = chat.name;
-    room.addEventListener("click", () => {
+    room.addEventListener("click", (event) => {
       currentRoom = chat.guid;
+      chatHeader.textContent = event.target.textContent;
       socket.emit("join", { roomID: chat.guid });
     });
     chatsEl.appendChild(room);
@@ -137,11 +137,11 @@ function renderMessages(messages) {
 }
 
 function renderMessage({ sender, message, timestamp }) {
+
   const li = document.createElement("li");
   li.className = sender === nickname ? "msgcont-me" : "msgcont-other";
-  const date = new Date(timestamp);
 
-console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const date = new Date(timestamp);
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
 
