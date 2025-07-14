@@ -17,10 +17,9 @@ import pagesRouter from './routes/pagesRouter.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
-
+app.set('trust proxy', 1);
 // Apply basic middlewares (JSON parser, CORS, etc.)
 commonMiddleware(app);
-
 // Set up session handling
 app.use(sessionMiddleware(pool));
 
@@ -50,6 +49,6 @@ setupSocket(io);
 
 // Start HTTP + WebSocket server
 const PORT = process.env.PORT || 3000;
-server.listen(3000, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
