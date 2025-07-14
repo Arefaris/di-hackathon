@@ -11,7 +11,7 @@ const sessionMiddleware = (pool) => session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 24 hours
+        maxAge: 86400000, // 24 hours (1000 * 60 * 60 * 24)
         secure: process.env.NODE_ENV === 'production', // true for HTTPS in production
         httpOnly: true, // Prevent client-side JS from accessing the cookie
         sameSite: 'lax' // CSRF protection
