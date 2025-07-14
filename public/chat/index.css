@@ -118,10 +118,18 @@ body {
 
 .msgcont-me,
 .msgcont-other {
+  position: relative;
   max-width: 300px;
+  min-width: 100px;
   border-radius: 10px;
-  padding: 10px 20px;
+  padding: 10px 40px;
   word-wrap: break-word;
+}
+.time-ms {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  font-size: smaller;
 }
 
 .msgcont-me {
@@ -205,5 +213,13 @@ body {
   border-radius: 5px;
   color: white;
   font-family: inherit;
+}
+
+.chat-area-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #333;
+  height: 3rem;
 }
 
