@@ -3,12 +3,12 @@ const errorHandler = (err, req, res, next) => {
 
     // Send a detailed error information in dev-mode and a general info in prod.  
     if (process.env.NODE_ENV === 'development') {
-        res.status(err.status || 500).json({
+        res.status(err.statusCode || 500).json({
             message: err.message,
             error: err.stack
         });
     } else {
-        res.status(err.status || 500).json({
+        res.status(err.statusCode || 500).json({
             message: 'Internal Server Error'
         });
     }
