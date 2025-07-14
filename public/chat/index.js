@@ -88,13 +88,33 @@ socket.on("message", renderMessage);
 
 socket.on("error", console.error);
 
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true
+  } catch (err) {
+    console.error(err);
+    return false
+  }
+}
+
 //Rendering
 function renderChats(chats) {
   chatsEl.innerHTML = "";
   chats.forEach(({ name, guid }) => {
     const room = document.createElement("div");
+    const linkIcon = document.createElement("i")
+    linkIcon.classList.add("copy-room", "fa-solid", "fa-share-from-square")
     room.classList.add("room");
     room.textContent = name;
+    room.appendChild(linkIcon)
+    
+    linkIcon.addEventListener("click", (event)=>{
+      event.stopPropagation()
+      linkIcon.style.color = "green"
+      copyToClipboard(guid)
+    })
+
     room.addEventListener("click", () => {
       currentRoom = guid;
       chatHeader.textContent = name
@@ -130,30 +150,57 @@ function appendChatIfNotExists(chat) {
   }
 }
 
-
+let namesWithColor = []
 function renderMessages(messages) {
   messages.forEach(renderMessage);
   console.log(messages)
+}
+
+
+function getRandomHSLColor() {
+  const h = Math.floor(Math.random() * 360);       // оттенок от 0 до 359
+  const s = Math.floor(Math.random() * 51) + 50;   // насыщенность от 50% до 100%
+  const l = Math.floor(Math.random() * 31) + 40;   // яркость от 40% до 70%
+  return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 function renderMessage({ sender, message, timestamp }) {
 
   const li = document.createElement("li");
   li.className = sender === nickname ? "msgcont-me" : "msgcont-other";
-
+  
   const date = new Date(timestamp);
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
 
-  const name = document.createElement("div");
-  name.textContent = sender;
-  name.className = "name"
+  
+  if (sender !== nickname) {
+    const name = document.createElement("div");
+    name.textContent = sender;
+    name.className = "name"
+
+    const existing = namesWithColor.find(entry => entry.name === sender);
+
+  if (existing) {
+    name.style.color = existing.color;
+  } else {
+    const color = getRandomHSLColor();
+    name.style.color = color;
+    namesWithColor.push({
+      name: sender,
+      color: color
+    });
+  }
+    
+    li.append(name)
+  }
+  
   const text = document.createElement("div");
   text.textContent = message;
   const time = document.createElement("div")
   time.textContent = `${hours}:${minutes}`
   time.className = "time-ms"
-  li.append(name, text, time);
+  li.append(text, time);
   messagesList.appendChild(li);
   li.scrollIntoView({ behavior: "smooth" });
 }
