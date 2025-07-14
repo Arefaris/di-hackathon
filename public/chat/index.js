@@ -106,11 +106,12 @@ function renderChats(chats) {
 
   if (refresh){
      const firstRoom = chatsEl.firstElementChild;
-     firstRoom.click();
-     refresh=false
-  }
- 
-  
+     if(firstRoom){
+      firstRoom.click();
+      refresh=false
+     }
+     
+  }  
 }
 
 function appendChatIfNotExists(chat) {
@@ -132,18 +133,25 @@ function appendChatIfNotExists(chat) {
 
 function renderMessages(messages) {
   messages.forEach(renderMessage);
+  console.log(messages)
 }
 
-function renderMessage({ sender, message }) {
+function renderMessage({ sender, message, timestamp }) {
   const li = document.createElement("li");
   li.className = sender === nickname ? "msgcont-me" : "msgcont-other";
+  const date = new Date(timestamp);
+
+console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
 
   const name = document.createElement("div");
   name.textContent = sender;
+  name.className = "name"
   const text = document.createElement("div");
   text.textContent = message;
   const time = document.createElement("div")
-  time.textContent = "10:28"
+  time.textContent = `${hours}:${minutes}`
   time.className = "time-ms"
   li.append(name, text, time);
   messagesList.appendChild(li);
