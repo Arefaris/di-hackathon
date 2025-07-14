@@ -41,6 +41,8 @@ DATABASE_URL=your_neon_connection_string # Your PostgreSQL connection string (e.
 SESSION_SECRET=your_super_secret # Secret key for sessions (generate a strong one)
 NODE_ENV=development # Or 'production' for production environment
 ORIGIN_URL=http://localhost:3000 # Your frontend's URL if it's separate. Otherwise, this is the backend URL.
+PORT=3000 # Port for running your backend. 
+
 ```
 
 **Database Setup**
