@@ -14,7 +14,7 @@ const sessionMiddleware = (pool) => session({
         maxAge: 86400000, // 24 hours (1000 * 60 * 60 * 24)
         secure: process.env.NODE_ENV === 'production', // true for HTTPS in production
         httpOnly: true, // Prevent client-side JS from accessing the cookie
-        sameSite: 'Lax' //CSRF secure
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
     }
 });
 

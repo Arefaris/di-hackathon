@@ -42,12 +42,6 @@ export const loginUser = async (req, res, next) => {
         req.session.cookie.expires = new Date(Date.now() + 86400000);
         req.session.modified = true;
         await req.session.save();
-        console.log(req.session);
-        
-        console.log('Environment:', process.env.NODE_ENV);
-        console.log('Origin URL:', process.env.ORIGIN_URL);;
-        console.log('Request protocol:', req.protocol);
-        console.log('Request secure:', req.secure);
         res.status(200).json({ msg: "Login successful", user: { id: user.id, username: user.username } });
     } catch (err) {
         next(err);
