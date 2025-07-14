@@ -145,7 +145,12 @@ function appendChatIfNotExists(chat) {
     room.textContent = chat.name;
     room.appendChild(linkIcon)
     
-    
+     linkIcon.addEventListener("click", (event)=>{
+      event.stopPropagation()
+      linkIcon.style.color = "green"
+      copyToClipboard(guid)
+    })
+
     
     room.addEventListener("click", (event) => {
       currentRoom = chat.guid;
