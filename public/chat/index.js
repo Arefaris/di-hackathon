@@ -1,4 +1,6 @@
-const socket = io();
+const socket = io({
+  withCredentials: true
+});;
 const nickname = localStorage.getItem("nickname");
 let currentRoom = "";
 
@@ -7,7 +9,7 @@ const form = document.getElementById("form");
 const input = document.getElementById("input");
 const messagesList = document.getElementById("messages");
 const chatsEl = document.querySelector(".chats");
-
+const chatHeader = document.querySelector(".chat-area-header")
 const modalJoin = document.getElementById("modal-join");
 const modalCreate = document.getElementById("modal-create");
 
@@ -21,6 +23,7 @@ const createRoomInput = document.getElementById("create-room-input");
 const confirmJoinBtn = document.querySelector(".confirm-join");
 const confirmCreateBtn = document.querySelector(".confirm-create");
 
+let refresh = true
 //Event listeners
 openJoinBtn.addEventListener("click", () => toggleModal(modalJoin, true));
 openCreateBtn.addEventListener("click", () => toggleModal(modalCreate, true));
@@ -45,7 +48,16 @@ confirmCreateBtn.addEventListener("click", (e) => {
   const roomname = createRoomInput.value.trim();
   if (roomname) {
     socket.emit("create", { nickname, roomname });
-    socket.once("created", () => location.reload());
+    socket.once("created", (data) => {
+        const {chatID, roomname} = data
+        //adding chat to the list
+        appendChatIfNotExists({
+            name: roomname,
+            guid: chatID
+        })
+        toggleModal(modalCreate, false)
+        console.log(data)
+    });
   }
 });
 
@@ -64,6 +76,7 @@ form.addEventListener("submit", (e) => {
 socket.emit("chatsList");
 
 socket.on("joined", (data) => {
+
   currentRoom = data.guid;
   messagesList.innerHTML = "";
   appendChatIfNotExists(data);;
@@ -85,10 +98,19 @@ function renderChats(chats) {
     room.textContent = name;
     room.addEventListener("click", () => {
       currentRoom = guid;
+      chatHeader.textContent = name
       socket.emit("join", { roomID: guid });
     });
     chatsEl.appendChild(room);
   });
+
+  if (refresh){
+     const firstRoom = chatsEl.firstElementChild;
+     firstRoom.click();
+     refresh=false
+  }
+ 
+  
 }
 
 function appendChatIfNotExists(chat) {
@@ -120,8 +142,10 @@ function renderMessage({ sender, message }) {
   name.textContent = sender;
   const text = document.createElement("div");
   text.textContent = message;
-
-  li.append(name, text);
+  const time = document.createElement("div")
+  time.textContent = "10:28"
+  time.className = "time-ms"
+  li.append(name, text, time);
   messagesList.appendChild(li);
   li.scrollIntoView({ behavior: "smooth" });
 }
