@@ -60,6 +60,11 @@ body {
   padding: 0.4vw;
   /* box-shadow: 0 0 .4vw rgba(0,0,0,0.5); */
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.send:hover {
+  background-color: #4f4487;
 }
 
 .button:hover {
@@ -121,7 +126,7 @@ body {
   position: relative;
   max-width: 300px;
   min-width: 100px;
-  border-radius: 10px;
+  border-radius: 18px;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 10px;
@@ -140,11 +145,13 @@ body {
 }
 .msgcont-me {
   align-self: flex-end;
+  border-bottom-right-radius: 4px;
   background-color: #8774e1;
 }
 
 .msgcont-other {
   align-self: flex-start;
+  border-bottom-left-radius: 4px;
   background-color: #212121;
 }
 
