@@ -7,6 +7,14 @@ const msg = document.querySelector(".msg")
 regBtnEl.addEventListener("click", async(event)=>{
     event.preventDefault()
     if(loginInptEl.value && password.value){
+        fetch("/logout", {
+                method: "POST",
+                credentials: 'include',
+                headers: {
+                'Content-Type': 'application/json', 
+                },
+            })
+            
         const response = await fetch("/register", {
             method: "POST",
             credentials: 'include',
@@ -28,7 +36,10 @@ regBtnEl.addEventListener("click", async(event)=>{
             errorMsg.style.display = "none"
             msg.textContent = data.msg
             localStorage.setItem("nickname",  data.user.username);
-            //window.location.href = "/chat/"
+            setTimeout(() => {
+                window.location.href = "/"
+            }, 3000);
+            
             
            }
             
