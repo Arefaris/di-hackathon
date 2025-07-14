@@ -9,6 +9,7 @@ regBtnEl.addEventListener("click", async(event)=>{
     if(loginInptEl.value && password.value){
         const response = await fetch("/register", {
             method: "POST",
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json', 
             },
@@ -27,7 +28,7 @@ regBtnEl.addEventListener("click", async(event)=>{
             errorMsg.style.display = "none"
             msg.textContent = data.msg
             localStorage.setItem("nickname",  data.user.username);
-            window.location.href = "/chat/"
+            //window.location.href = "/chat/"
             
            }
             
