@@ -139,8 +139,14 @@ function appendChatIfNotExists(chat) {
   );
   if (!exists) {
     const room = document.createElement("div");
+    const linkIcon = document.createElement("i")
+    linkIcon.classList.add("copy-room", "fa-solid", "fa-share-from-square")
     room.classList.add("room");
     room.textContent = chat.name;
+    room.appendChild(linkIcon)
+    
+    
+    
     room.addEventListener("click", (event) => {
       currentRoom = chat.guid;
       chatHeader.textContent = event.target.textContent;
