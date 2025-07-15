@@ -24,7 +24,7 @@ commonMiddleware(app);
 // Set up session handling
 app.use(sessionMiddleware(pool));
 
-// Serve static files (e.g. frontend)
+// Serve static files (frontend)
 app.use(express.static(join(__dirname, "public")));
 // Mount API and page routes
 app.use(userRouter);
