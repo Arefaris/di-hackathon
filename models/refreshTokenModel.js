@@ -16,6 +16,7 @@ export async function createRefreshToken({ user_id, token, expires_at, user_agen
 
 export async function findRefreshToken(token) {
   return await db('refresh_tokens')
+    .select('user_id', 'expires_at')
     .where({ token })
     .first();
 }
@@ -36,6 +37,7 @@ export async function deleteAllRefreshTokensForUser(user_id) {
 // This function retrieves a refresh token for a specific user from the database
 export async function getRefreshTokenByUserId(user_id) {
   return await db('refresh_tokens')
+    .select('token', 'expires_at')
     .where({ user_id })
     .first();
 }

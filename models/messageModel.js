@@ -22,6 +22,7 @@ export async function getMessagesForChat(chat_id) {
 
 export async function getMessageById(id) {
   return await db('messages')
+    .select('token', 'expires_at')
     .where({ id })
     .first();
 }
