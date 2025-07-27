@@ -53,7 +53,7 @@ const createSendToken = async (user, statusCode, req, res) => {
     });
 
 
-    // Remove sensitive data from user object
+    // Remove sensitive data from user object and send response
     const { password_hash, ...safeUser } = user;
     res.status(statusCode).json({
         status: 'success',
@@ -75,7 +75,12 @@ export const registerUser = async (req, res, next) => {
 
         const password_hash = await bcrypt.hash(password, 10);
         const [newUser] = await createUser({ username, password_hash });
-        res.status(201).json({ msg: "User registered", user: { id: newUser.id, username: newUser.username } });
+
+        //Pass the new user to createSendToken to generate and send tokens
+        createSendToken(newUser, 201, req, res);
+
+        // LEGACY CODE:
+        // res.status(201).json({ msg: "User registered", user: { id: newUser.id, username: newUser.username } });
     } catch (err) {
         next(err);
     }

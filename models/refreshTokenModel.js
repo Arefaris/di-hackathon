@@ -31,3 +31,11 @@ export async function deleteAllRefreshTokensForUser(user_id) {
     .where({ user_id })
     .del();
 }
+
+// Function to get a refresh token by user ID
+// This function retrieves a refresh token for a specific user from the database
+export async function getRefreshTokenByUserId(user_id) {
+  return await db('refresh_tokens')
+    .where({ user_id })
+    .first();
+}
