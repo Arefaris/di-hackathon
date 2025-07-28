@@ -1,21 +1,40 @@
 import jwt from 'jsonwebtoken';
 import { getUserById } from '../models/userModel.js';
-import AppError from '../utils/AppError.js';
+import AuthError from '../utils/AppError.js';
+import AuthError from '../utils/AuthError.js';
 import { signToken } from '../utils/jwt.js';
 import ms from 'ms';
 
+function getTokenFromRequest(req, options = {}) {
+    const {
+        headerName = 'Authorization',
+        cookieName = 'jwt',
+        scheme = 'Bearer'
+    } = options;
+
+    // Priority 1: Authorization header
+    if (
+        req.headers[headerName.toLowerCase()] &&
+        req.headers[headerName.toLowerCase()].startsWith(`${scheme} `)
+    ) {
+        return req.headers[headerName.toLowerCase()].split(' ')[1];
+    }
+
+    // Priority 2: Cookie
+    if (req.cookies && req.cookies[cookieName]) {
+        return req.cookies[cookieName];
+    }
+
+    return null;
+}
+
 export const protect = async (req, res, next) => {
     try {
-        let token;
         // 1) Retrieve token from Authorization header or cookies
-        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-            token = req.headers.authorization.split(' ')[1];
-        } else if (req.cookies.jwt) { // Fallback to cookie if header is absent
-            token = req.cookies.jwt;
-        }
+        const token = getTokenFromRequest(req, { cookieName: 'jwt' });
 
         if (!token) {
-            return next(new AppError('You are not logged in! Please log in to get access.', 401));
+            return next(new AuthError('You are not logged in! Please log in to get access.'));
         }
 
         // 2) Verify the token
@@ -24,7 +43,7 @@ export const protect = async (req, res, next) => {
         // 3) Check if user still exists in the database
         const currentUser = await getUserById(decoded.id);
         if (!currentUser) {
-            return next(new AppError('The user belonging to this token no longer exists.', 401));
+            return next(new AuthError('The user belonging to this token no longer exists.'));
         }
 
         // 4) Attach user to request and response locals for future access
@@ -34,10 +53,10 @@ export const protect = async (req, res, next) => {
     } catch (err) {
         // Handle specific JWT errors
         if (err.name === 'JsonWebTokenError') {
-            return next(new AppError('Invalid token. Please log in again!', 401));
+            return next(new AuthError('Invalid token. Please log in again!'));
         }
         if (err.name === 'TokenExpiredError') {
-            return next(new AppError('Your access token has expired. Please refresh your session.', 401));
+            return next(new AuthError('Your access token has expired. Please refresh your session.'));
         }
         next(err); // Pass other errors to the global error handler
     }
@@ -45,10 +64,10 @@ export const protect = async (req, res, next) => {
 
 // Middleware to handle refresh token logic (optional but recommended)
 export const refreshAccessToken = async (req, res, next) => {
-    const refreshToken = req.cookies.refreshJwt;
+    const refreshToken = getTokenFromRequest(req, { cookieName: 'refreshJwt' });
 
     if (!refreshToken) {
-        return next(new AppError('No refresh token provided. Please log in.', 401));
+        return next(new AuthError('No refresh token provided. Please log in.'));
     }
 
     try {
@@ -56,18 +75,18 @@ export const refreshAccessToken = async (req, res, next) => {
 
         // Check if the decoded token has a valid user ID
         if (!decoded || !decoded.id) {
-            return next(new AppError('Invalid refresh token.', 401));
+            return next(new AuthError('Invalid refresh token.'));
         }
-        
+
         // Check if refresh token matches the one stored in the database (i.e. not revoked)
         const stored = await findRefreshToken(refreshToken);
         if (!stored || stored.user_id !== decoded.id) {
-            return next(new AppError('Refresh token has been revoked or is invalid.', 401));
+            return next(new AuthError('Refresh token has been revoked or is invalid.'));
         }
 
         const user = await getUserById(decoded.id);
         if (!user) {
-            return next(new AppError('Invalid refresh token. User not found.', 401));
+            return next(new AuthError('Invalid refresh token. User not found.'));
         }
 
 
@@ -88,7 +107,7 @@ export const refreshAccessToken = async (req, res, next) => {
         });
     } catch (err) {
         if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-            return next(new AppError('Invalid or expired refresh token. Please log in again.', 401));
+            return next(new AuthError('Invalid or expired refresh token. Please log in again.'));
         }
         next(err);
     }
