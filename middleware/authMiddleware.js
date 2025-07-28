@@ -2,9 +2,14 @@ import jwt from 'jsonwebtoken';
 import { getUserById } from '../models/userModel.js';
 import AuthError from '../utils/AuthError.js';
 import { signToken } from '../utils/jwt.js';
-import ms from 'ms';
 import { authConfig } from '../config/auth.js';
 
+/**
+ * Extracts JWT token from request headers or cookies
+ * @param {Request} req - Express request object
+ * @param {Object} options - Configuration options
+ * @returns {string|null} - The extracted token or null
+ */
 function getTokenFromRequest(req, options = {}) {
     const {
         headerName = authConfig.accessToken.headerName,
@@ -12,33 +17,44 @@ function getTokenFromRequest(req, options = {}) {
         scheme = authConfig.accessToken.scheme
     } = options;
 
+    let token = null;
+
     // Priority 1: Authorization header
     if (
         req.headers[headerName.toLowerCase()] &&
         req.headers[headerName.toLowerCase()].startsWith(`${scheme} `)
     ) {
-        return req.headers[headerName.toLowerCase()].split(' ')[1];
+        token = req.headers[headerName.toLowerCase()].split(' ')[1];
     }
 
     // Priority 2: Cookie
     if (req.cookies && req.cookies[cookieName]) {
-        return req.cookies[cookieName];
+        token = req.cookies[cookieName];
     }
 
-    return null;
+    if (!token || typeof token !== 'string' || token.length < 10) return null;
+
+    return token;
 }
 
+/**
+ * Middleware to protect routes requiring authentication
+ * @async
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next middleware function
+ */
 export const protect = async (req, res, next) => {
     try {
         // 1) Retrieve token from Authorization header or cookies
-        const token = getTokenFromRequest(req, { cookieName: authConfig.accessToken.cookieName });
+        const accessToken = getTokenFromRequest(req, { cookieName: authConfig.accessToken.cookieName });
 
-        if (!token) {
+        if (!accessToken) {
             return next(new AuthError('You are not logged in! Please log in to get access.'));
         }
 
         // 2) Verify the token
-        const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = await jwt.verify(accessToken, process.env.JWT_SECRET);
 
         // 3) Check if user still exists in the database
         const currentUser = await getUserById(decoded.id);
@@ -62,9 +78,17 @@ export const protect = async (req, res, next) => {
     }
 };
 
-// Middleware to handle refresh token logic (optional but recommended)
+/**
+ * Middleware to refresh the access token using a valid refresh token
+ * @async
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @param {import('express').NextFunction} next - Express next middleware function
+ * @throws {AuthError} When refresh token is missing, invalid, or expired
+ * @returns {Promise<void>} Sends new access token in response or passes error to next middleware
+ * */
 export const refreshAccessToken = async (req, res, next) => {
-    const refreshToken = getTokenFromRequest(req, { cookieName: 'refreshJwt' });
+    const refreshToken = getTokenFromRequest(req, { cookieName: authConfig.refreshToken.cookieName });
 
     if (!refreshToken) {
         return next(new AuthError('No refresh token provided. Please log in.'));
