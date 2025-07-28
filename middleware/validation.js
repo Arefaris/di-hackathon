@@ -1,4 +1,4 @@
-import AppError from './appError.js';
+import AppError from '../utils/appError.js';
 
 
 export const validateUsernameAndPassword = (req, res, next) => {

@@ -10,7 +10,7 @@ import { setupSocket } from './socket/index.js';
 import pool from './config/pool.js';
 import sessionMiddleware from './middleware/sessionConfig.js';
 import commonMiddleware from './middleware/commonMiddleware.js';
-import errorHandler from './middleware/errorHandler.js';
+import errorHandler from './utils/errorHandler.js';
 
 import userRouter from './routes/userRouter.js';
 import pagesRouter from './routes/pagesRouter.js';
