@@ -1,15 +1,15 @@
 import jwt from 'jsonwebtoken';
 import { getUserById } from '../models/userModel.js';
-import AuthError from '../utils/AppError.js';
 import AuthError from '../utils/AuthError.js';
 import { signToken } from '../utils/jwt.js';
 import ms from 'ms';
+import { authConfig } from '../config/auth.js';
 
 function getTokenFromRequest(req, options = {}) {
     const {
-        headerName = 'Authorization',
-        cookieName = 'jwt',
-        scheme = 'Bearer'
+        headerName = authConfig.accessToken.headerName,
+        cookieName = authConfig.accessToken.cookieName, // Default cookie name for access token. Replace on invoke.
+        scheme = authConfig.accessToken.scheme
     } = options;
 
     // Priority 1: Authorization header
@@ -31,7 +31,7 @@ function getTokenFromRequest(req, options = {}) {
 export const protect = async (req, res, next) => {
     try {
         // 1) Retrieve token from Authorization header or cookies
-        const token = getTokenFromRequest(req, { cookieName: 'jwt' });
+        const token = getTokenFromRequest(req, { cookieName: authConfig.accessToken.cookieName });
 
         if (!token) {
             return next(new AuthError('You are not logged in! Please log in to get access.'));
@@ -92,13 +92,10 @@ export const refreshAccessToken = async (req, res, next) => {
 
         const newAccessToken = signToken(user.id, process.env.JWT_SECRET, process.env.JWT_EXPIRES_IN);
 
-        const cookieOptions = {
-            expires: new Date(Date.now() + ms(process.env.JWT_EXPIRES_IN)),
-            httpOnly: true,
-        };
-        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-
-        res.cookie('jwt', newAccessToken, cookieOptions);
+        res.cookie(authConfig.accessToken.cookieName, newAccessToken, {
+            ...authConfig.accessToken.cookieOptions,
+            expires: new Date(Date.now() + authConfig.accessToken.expiresIn)
+        });
 
         res.status(200).json({
             status: 'success',
