@@ -1,4 +1,5 @@
 import { createRefreshToken } from '../models/refreshTokenModel.js';
+import jwt from 'jsonwebtoken';
 
 // Suppott function to sign a JWT token
 // This function creates a JWT token with the user ID, secret, and expiration time

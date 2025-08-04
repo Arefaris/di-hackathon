@@ -4,7 +4,7 @@ import { addParticipant } from '../models/chatParticipantModel.js'
 import { getMessagesForChat } from '../models/messageModel.js'
 
 export function handleRoomEvents(io, socket, userId, username) {
-  socket.on('create', async ({ roomname }) => { //TODO: Remove nickname on front and here
+  socket.on('create', async ({ roomname }) => { 
     if (!roomname) {
       return socket.emit('error', { message: 'Room name is required.' });
     }
@@ -26,7 +26,7 @@ export function handleRoomEvents(io, socket, userId, username) {
     }
   });
 
-  socket.on('join', async ({ roomID }) => { //TODO: Remove nickname on front and here
+  socket.on('join', async ({ roomID }) => { 
     if (!roomID) {
       return socket.emit('error', { message: 'Room name is required.' });
     }
@@ -54,24 +54,6 @@ export function handleRoomEvents(io, socket, userId, username) {
       socket.emit('error', { message: 'Failed to join chat.' });
     }
   });
-
-  // LEGACY
-  // socket.on('chatCheck', async ({ roomID }) => {
-  //   if (!roomID) {
-  //     return socket.emit('error', { message: 'Room name is required.' });
-  //   }
-  //   if (!userId) { // Authentication check
-  //     return socket.emit('error', { message: 'Unauthorized: User not logged in.' });
-  //   }
-  //   try {
-  //     const chat = await getChatByGUID(roomID);
-  //     const chatFlag = Boolean(chat);
-  //     socket.emit('chatCheck', { chatFlag });
-  //   } catch (error) {
-  //     console.error('Error in chatCheck:', error);
-  //     socket.emit('chatCheck', { chatFlag: false });
-  //   }
-  // });
 
   socket.on('chatsList', async () => {
     if (!userId) { // Authentication check

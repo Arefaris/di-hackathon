@@ -1,4 +1,4 @@
-import { AppError } from './AppError.js';
+import { AppError } from './appError.js';
 
 export class AuthError extends AppError {
     constructor(message, statusCode = 401) {

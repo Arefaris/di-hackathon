@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import {
     createUser,
     getUserByUsername,
@@ -27,9 +26,6 @@ export const registerUser = async (req, res, next) => {
         //Pass the new user to createSendToken to generate and send tokens
         //Automaticly logging in the user after registration
         createSendToken(newUser, 201, req, res);
-
-        // LEGACY CODE:
-        // res.status(201).json({ msg: "User registered", user: { id: newUser.id, username: newUser.username } });
     } catch (err) {
         next(err);
     }
@@ -47,17 +43,7 @@ export const loginUser = async (req, res, next) => {
         }
 
         // Pass the user to createSendToken to generate and send tokens after successful login
-        createSendToken(user, 200, res);
-
-        // LEGACY CODE:
-        // //Save user data in a session
-        // req.session.userId = user.id;
-        // req.session.username = user.username;
-        // req.session.isLoggedIn = true;
-        // req.session.cookie.expires = new Date(Date.now() + 86400000);
-        // req.session.modified = true;
-        // await req.session.save();
-        // res.status(200).json({ msg: "Login successful", user: { id: user.id, username: user.username } });
+        createSendToken(user, 200, req, res);
     } catch (err) {
         next(err);
     }
@@ -75,22 +61,6 @@ export const logoutUser = (req, res) => {
     });
     res.status(200).json({ msg: "Logout successful" });
 };
-
-// LEGACY CODE:
-// export const logoutUser = async (req, res, next) => {
-//     try {
-//         req.session.destroy((err) => {
-//             if (err) {
-//                 console.error("Error destroying session:", err);
-//                 return next(new AppError('Failed to log out due to server error.', 500));
-//             }
-//             res.clearCookie('connect.sid');
-//             res.status(200).json({ msg: "Logout successful" });
-//         });
-//     } catch (err) {
-//         next(err);
-//     }
-// };
 
 export const requireAuth = (req, res, next) => {
     if (!req.session || !req.session.isLoggedIn) {

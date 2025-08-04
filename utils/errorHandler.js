@@ -1,4 +1,5 @@
 const errorHandler = (err, req, res, next) => {
+    console.log('Global Error Handler');
     console.error(err.stack); // log error stack
 
     // Send a detailed error information in dev-mode and a general info in prod.  
